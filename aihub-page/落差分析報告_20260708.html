@@ -1,0 +1,572 @@
+<meta charset="utf-8">
+<title>出版日期 × 上線日期 落差分析</title>
+<style>
+:root{
+  --page:#f7f7f4; --surface:#fcfcfb; --ink:#1c1c1a; --ink2:#52514e; --muted:#898781;
+  --grid:#e6e5de; --baseline:#c3c2b7; --border:rgba(20,20,18,.1);
+  --accent:#2a78d6;
+  --c-early:#2a78d6; --c-sync:#b3b1a7; --c-short:#eda100; --c-medium:#eb6834; --c-huge:#d03b3b;
+  --seq0:#eef4fd; --seq1:#cde2fb; --seq2:#9ec5f4; --seq3:#6da7ec; --seq4:#3987e5; --seq5:#256abf; --seq6:#184f95; --seq7:#0d366b;
+  --good:#0a7a0a; --warn-bg:#fdf6e7;
+  --code-bg:#f1f0ea;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --page:#111110; --surface:#1a1a19; --ink:#f2f1ec; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,.12);
+    --accent:#3987e5;
+    --c-early:#3987e5; --c-sync:#57564f; --c-short:#c98500; --c-medium:#d95926; --c-huge:#e66767;
+    --seq0:#1e2531; --seq1:#16304d; --seq2:#1c4573; --seq3:#255e9e; --seq4:#3987e5; --seq5:#6da7ec; --seq6:#9ec5f4; --seq7:#cde2fb;
+    --good:#3fbf3f; --warn-bg:#2a2415;
+    --code-bg:#242422;
+  }
+}
+:root[data-theme="light"]{
+  --page:#f7f7f4; --surface:#fcfcfb; --ink:#1c1c1a; --ink2:#52514e; --muted:#898781;
+  --grid:#e6e5de; --baseline:#c3c2b7; --border:rgba(20,20,18,.1);
+  --accent:#2a78d6;
+  --c-early:#2a78d6; --c-sync:#b3b1a7; --c-short:#eda100; --c-medium:#eb6834; --c-huge:#d03b3b;
+  --seq0:#eef4fd; --seq1:#cde2fb; --seq2:#9ec5f4; --seq3:#6da7ec; --seq4:#3987e5; --seq5:#256abf; --seq6:#184f95; --seq7:#0d366b;
+  --good:#0a7a0a; --warn-bg:#fdf6e7;
+  --code-bg:#f1f0ea;
+}
+:root[data-theme="dark"]{
+  --page:#111110; --surface:#1a1a19; --ink:#f2f1ec; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,.12);
+  --accent:#3987e5;
+  --c-early:#3987e5; --c-sync:#57564f; --c-short:#c98500; --c-medium:#d95926; --c-huge:#e66767;
+  --seq0:#1e2531; --seq1:#16304d; --seq2:#1c4573; --seq3:#255e9e; --seq4:#3987e5; --seq5:#6da7ec; --seq6:#9ec5f4; --seq7:#cde2fb;
+  --good:#3fbf3f; --warn-bg:#2a2415;
+  --code-bg:#242422;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--page); color:var(--ink);
+  font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:15px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1020px;margin:0 auto;padding:48px 24px 96px}
+a{color:var(--accent)}
+
+/* ---------- header ---------- */
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(26px,4.2vw,38px);line-height:1.3;margin:0 0 14px;font-weight:700;letter-spacing:.01em;text-wrap:balance}
+.thesis{font-size:17px;color:var(--ink2);max-width:44em;margin:0 0 8px}
+.thesis strong{color:var(--ink)}
+.meta{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:18px}
+
+/* ---------- sections ---------- */
+section{margin-top:64px}
+h2{font-size:21px;margin:0 0 4px;font-weight:700;letter-spacing:.01em}
+.sec-label{font-size:12px;letter-spacing:.14em;color:var(--accent);margin-bottom:6px;font-weight:600}
+.lede{color:var(--ink2);max-width:46em;margin:6px 0 22px}
+.lede b,.note b{color:var(--ink)}
+
+/* ---------- KPI row ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:28px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px 14px}
+.kpi .lab{font-size:12.5px;color:var(--muted);line-height:1.4}
+.kpi .val{font-size:30px;font-weight:650;line-height:1.2;margin-top:6px}
+.kpi .sub{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.45}
+.kpi.flag .val{color:var(--c-huge)}
+.kpi.ok .val{color:var(--good)}
+
+/* ---------- cards / charts ---------- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px 18px;margin-top:18px}
+.card h3{margin:0;font-size:15.5px;font-weight:650}
+.card .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.toggles{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;flex:none}
+.toggles button{
+  appearance:none;border:0;background:transparent;color:var(--ink2);cursor:pointer;
+  font:inherit;font-size:12.5px;padding:5px 12px;line-height:1.4;
+}
+.toggles button + button{border-left:1px solid var(--border)}
+.toggles button.on{background:var(--accent);color:#fff}
+.toggles button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink2);margin:2px 0 12px}
+.legend .it{display:inline-flex;align-items:center;gap:6px}
+.legend .sw{width:11px;height:11px;border-radius:3px;flex:none}
+.chart-scroll{overflow-x:auto}
+svg{display:block}
+svg text{font-family:inherit}
+.axis-t{font-size:11px;fill:var(--muted)}
+.bar-lab{font-size:11.5px;fill:var(--ink2)}
+figure{margin:0}
+figcaption,.note{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.7}
+.tblv{display:none;overflow-x:auto}
+.tblv.on{display:block}
+.chartv.off{display:none}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 12px;text-align:right;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums;white-space:nowrap}
+th{color:var(--muted);font-weight:600;font-size:12px}
+th:first-child,td:first-child{text-align:left}
+tbody tr:hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.scrolltbl{max-height:340px;overflow:auto;border:1px solid var(--grid);border-radius:8px}
+.scrolltbl table{font-size:12.5px}
+.scrolltbl thead th{position:sticky;top:0;background:var(--surface);z-index:1}
+
+/* ---------- group cards ---------- */
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px}
+.gcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;border-top:3px solid var(--gc,var(--baseline))}
+.gcard h3{margin:0;font-size:16px}
+.gcard .n{font-size:26px;font-weight:650;margin:6px 0 2px}
+.gcard .pct{font-size:12.5px;color:var(--muted)}
+.gcard p{font-size:13.5px;color:var(--ink2);margin:10px 0 0;line-height:1.7}
+.gcard .cond{
+  margin-top:12px;padding:8px 10px;background:var(--code-bg);border-radius:6px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.6;color:var(--ink2);
+  overflow-x:auto;white-space:nowrap;
+}
+.gstats{display:flex;gap:18px;margin-top:12px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.gstats b{display:block;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums;font-weight:650}
+
+/* ---------- tooltip ---------- */
+#tip{
+  position:fixed;z-index:50;pointer-events:none;display:none;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 4px 18px rgba(0,0,0,.14);padding:9px 12px;font-size:12.5px;line-height:1.6;
+  max-width:260px;
+}
+#tip .t{font-weight:650;margin-bottom:3px}
+#tip .row{display:flex;align-items:center;gap:7px;white-space:nowrap}
+#tip .key{width:12px;height:3px;border-radius:2px;flex:none}
+#tip .v{font-weight:650;font-variant-numeric:tabular-nums}
+#tip .l{color:var(--ink2)}
+
+@media (prefers-reduced-motion:no-preference){
+  .kpi,.gcard{transition:border-color .15s}
+}
+@media (max-width:640px){
+  .wrap{padding:32px 16px 72px}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">數據分析報告 · 智慧編輯台</div>
+    <h1>「出版日期」與「上線日期」落差分析</h1>
+    <p class="thesis">落差不是隨機雜訊。<strong>99% 的一年以上大落差，集中在 2011/04 與 2012/06–07 兩波數位化匯入批次</strong>——這批文章的上線日期記錄的是「匯入作業日」，而非出版時間；另有一批老文章的上線日期已被回填為出版日期，顯示正常。</p>
+    <div class="meta">
+      <span>資料檔：article_202607081409.csv</span>
+      <span>共 86,313 篇文章</span>
+      <span>匯出時間 2026-07-08 14:09</span>
+      <span>落差 = 上線日期 − 出版日期（以日計）</span>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <section id="sec-dist">
+    <div class="sec-label">01 · 整體分布</div>
+    <h2>落差的統計分布</h2>
+    <p class="lede">中位數為 <b>0 天</b>（過半文章當天或前後一天上線），但平均高達 <b>510.6 天</b>、第 95 百分位 <b>3,854 天</b>——典型的極度右偏分布，代表存在一群結構性的大落差，而不是普遍性的小誤差。</p>
+    <div class="card">
+      <div class="card-head">
+        <div><h3>落差天數分布</h3><div class="sub">上線日期 − 出版日期，負值代表上線早於出版</div></div>
+        <div class="toggles" data-for="hist"><button class="on">圖表</button><button>表格</button></div>
+      </div>
+      <div class="chartv" id="hist-chart"></div>
+      <div class="tblv" id="hist-table"></div>
+      <p class="note">±1 天內共 <b>64,335 篇（74.5%）</b>屬正常同步；落差超過 1 年的 <b>14,737 篇（17.1%）</b>是本次要處理的主體。</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h3>整體統計量</h3><div class="sub">單位：天</div></div></div>
+      <div style="overflow-x:auto"><table id="stat-table"></table></div>
+      <p class="note">* 疑似日期錯誤的 95 篇是交叉子集（因上線年被誤植為 2010 以前，多數同時被計入回填組），故各群篇數加總為 100%，此列為額外標註。</p>
+    </div>
+  </section>
+
+  <section id="sec-timeline">
+    <div class="sec-label">02 · 時間軸</div>
+    <h2>大落差集中在哪些年份？</h2>
+    <p class="lede">切到「依上線年份」看：<b>2011 與 2012 年出現兩根異常高柱</b>，其中絕大多數是一年以上的大落差——這就是數位化匯入的痕跡。切到「依出版年份」看：受影響的文章出版於 <b>1981–2011 年</b>，以 2002–2010 年最多。</p>
+    <div class="card">
+      <div class="card-head">
+        <div><h3>各年份文章數 × 落差類型</h3><div class="sub" id="tl-sub">依上線年份</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div class="toggles" id="tl-mode">
+            <button class="on" data-m="oy">依上線年份</button><button data-m="cy">依出版年份</button>
+          </div>
+          <div class="toggles" data-for="tl"><button class="on">圖表</button><button>表格</button></div>
+        </div>
+      </div>
+      <div class="legend" id="tl-legend"></div>
+      <div class="chart-scroll chartv" id="tl-chart"></div>
+      <div class="tblv" id="tl-table"></div>
+      <p class="note">2011 年上線的 12,901 篇中，10,751 篇集中在 <b>2011 年 4 月</b>單月匯入；2012 年的第二波集中在 <b>6–7 月</b>（約 5,700 篇）。</p>
+    </div>
+  </section>
+
+  <section id="sec-heat">
+    <div class="sec-label">03 · 對照矩陣</div>
+    <h2>出版年 × 上線年 熱力圖</h2>
+    <p class="lede">三種模式一眼可辨：<b>對角線</b>＝上線年等於出版年（近年是正常營運，2010 以前則是「已回填」的老文章）；<b>2011、2012 兩條垂直帶</b>＝批次匯入、未回填的文章。</p>
+    <div class="card">
+      <div class="card-head">
+        <div><h3>文章數量矩陣</h3><div class="sub">縱軸：出版年份 · 橫軸：上線年份 · 顏色深度為篇數（平方根尺度）· 滑鼠移入看數字</div></div>
+      </div>
+      <div class="chart-scroll" id="heat-chart"></div>
+      <figcaption id="heat-cap">深藍 = 篇數多。左下對角段（1981–2010）為回填組；2011、2012 兩條縱帶為批次匯入組；右上對角段為日常營運。</figcaption>
+    </div>
+  </section>
+
+  <section id="sec-groups">
+    <div class="sec-label">04 · 規則歸納</div>
+    <h2>三群結構：落差的規則</h2>
+    <p class="lede">依上線年份與落差大小，全部 86,313 篇可以乾淨地切成三群，每群有明確的識別條件（可直接轉成 SQL）：</p>
+    <div class="groups" id="groups"></div>
+    <p class="note">佐證「回填」的細節：回填組 10,961 篇中，<b>10,954 篇（99.9%）的 onlineTime 與 createTime 連時分秒都完全相同</b>（均為 00:00:00）——這只可能是程式批次寫入，不是人工設定。另外，全部 86,313 篇的 createTime 時間部分都是 00:00:00，證實 createTime 的語意就是「日期型」的出版日。</p>
+  </section>
+
+  <section id="sec-neg">
+    <div class="sec-label">05 · 負落差</div>
+    <h2>上線早於出版：多數是正常的「提前上線」</h2>
+    <p class="lede">共 8,503 篇的上線日期早於出版日期，其中 <b>96%（8,157 篇）只早 1–2 天</b>——這是雜誌的正常節奏：文章在雜誌標定出版日前先行上線，93% 都有所屬雜誌編號。真正要注意的是早超過一個月的 <b>95 篇</b>，多為日期登打錯誤（例如 2021 誤植為 2001）。</p>
+    <div class="card">
+      <div class="card-head"><div><h3>負落差幅度分布</h3><div class="sub">上線早於出版的天數</div></div></div>
+      <div class="chartv" id="neg-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><h3>疑似日期錯誤清單（95 篇，早於出版逾一個月）</h3><div class="sub">依落差排序，建議人工檢核修正</div></div></div>
+      <div class="scrolltbl" id="anom-table"></div>
+      <p class="note">典型樣態：出版 2021-07-14、上線 2001-07-14——年份 2021 被誤植為 2001。這 95 篇因上線年被寫成 2010 以前，也混進了回填組的統計，是回填組中僅有的例外值來源。</p>
+    </div>
+  </section>
+
+  <footer style="margin-top:72px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--grid);padding-top:18px">
+    分析方法：落差以日曆日計算（onlineTime 日期 − createTime 日期）。分類定義——同步：±1 天；提前上線：早 2 天以上；小延遲：2–31 天；中延遲：1 個月–1 年；大延遲：超過 1 年。所有數字皆可在各圖表的「表格」檢視中核對。
+  </footer>
+</div>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+const DATA = {"meta":{"file":"article_202607081409.csv","exported":"2026-07-08 14:09","total":86313},"overall":{"n":86313,"min":-7305,"max":11328,"median":0.0,"mean":510.6,"p25":0,"p75":0,"p95":3854,"p99":7790},"class_counts":{"early":3293,"sync":64335,"short":1760,"medium":2188,"huge":14737},"hist":[{"label":"<-1月","n":95},{"label":"-1月~-8天","n":54},{"label":"-7~-2天","n":3144},{"label":"±1天","n":64335},{"label":"2~7天","n":1266},{"label":"8~31天","n":494},{"label":"1月~1年","n":2188},{"label":"1~5年","n":7159},{"label":"5~10年","n":2926},{"label":"10~20年","n":3346},{"label":">20年","n":1306}],"by_online_year":[{"y":1981,"early":0,"sync":207,"short":0,"medium":0,"huge":0},{"y":1982,"early":0,"sync":350,"short":0,"medium":0,"huge":0},{"y":1983,"early":0,"sync":279,"short":0,"medium":0,"huge":0},{"y":1984,"early":0,"sync":417,"short":0,"medium":0,"huge":0},{"y":1985,"early":0,"sync":475,"short":0,"medium":0,"huge":0},{"y":1986,"early":0,"sync":521,"short":0,"medium":0,"huge":0},{"y":1987,"early":0,"sync":464,"short":0,"medium":0,"huge":0},{"y":1988,"early":0,"sync":427,"short":0,"medium":0,"huge":0},{"y":1989,"early":0,"sync":227,"short":0,"medium":0,"huge":0},{"y":1990,"early":0,"sync":269,"short":0,"medium":0,"huge":0},{"y":1991,"early":0,"sync":238,"short":0,"medium":0,"huge":0},{"y":1992,"early":0,"sync":221,"short":0,"medium":0,"huge":0},{"y":1993,"early":0,"sync":234,"short":1,"medium":0,"huge":0},{"y":1994,"early":0,"sync":217,"short":0,"medium":0,"huge":0},{"y":1995,"early":0,"sync":254,"short":0,"medium":0,"huge":0},{"y":1996,"early":0,"sync":356,"short":0,"medium":0,"huge":0},{"y":1997,"early":0,"sync":397,"short":0,"medium":0,"huge":0},{"y":1998,"early":0,"sync":483,"short":0,"medium":0,"huge":0},{"y":1999,"early":0,"sync":339,"short":0,"medium":0,"huge":0},{"y":2000,"early":0,"sync":391,"short":0,"medium":0,"huge":0},{"y":2001,"early":2,"sync":631,"short":0,"medium":0,"huge":0},{"y":2002,"early":1,"sync":301,"short":0,"medium":0,"huge":0},{"y":2003,"early":0,"sync":386,"short":1,"medium":0,"huge":0},{"y":2004,"early":0,"sync":517,"short":0,"medium":0,"huge":0},{"y":2005,"early":0,"sync":563,"short":0,"medium":0,"huge":0},{"y":2006,"early":0,"sync":427,"short":0,"medium":0,"huge":0},{"y":2007,"early":2,"sync":455,"short":0,"medium":0,"huge":0},{"y":2008,"early":0,"sync":261,"short":0,"medium":0,"huge":0},{"y":2009,"early":0,"sync":271,"short":0,"medium":0,"huge":0},{"y":2010,"early":0,"sync":376,"short":0,"medium":0,"huge":0},{"y":2011,"early":15,"sync":1777,"short":289,"medium":2021,"huge":8799},{"y":2012,"early":6,"sync":2676,"short":231,"medium":6,"huge":5826},{"y":2013,"early":4,"sync":2805,"short":86,"medium":3,"huge":27},{"y":2014,"early":7,"sync":2783,"short":126,"medium":80,"huge":38},{"y":2015,"early":18,"sync":4522,"short":40,"medium":5,"huge":7},{"y":2016,"early":13,"sync":4160,"short":98,"medium":0,"huge":0},{"y":2017,"early":276,"sync":3669,"short":233,"medium":0,"huge":2},{"y":2018,"early":680,"sync":3053,"short":112,"medium":11,"huge":11},{"y":2019,"early":541,"sync":3454,"short":51,"medium":2,"huge":0},{"y":2020,"early":431,"sync":3579,"short":67,"medium":1,"huge":2},{"y":2021,"early":541,"sync":3289,"short":55,"medium":1,"huge":2},{"y":2022,"early":430,"sync":3334,"short":74,"medium":18,"huge":3},{"y":2023,"early":88,"sync":3623,"short":74,"medium":14,"huge":2},{"y":2024,"early":100,"sync":3819,"short":112,"medium":10,"huge":8},{"y":2025,"early":83,"sync":4595,"short":93,"medium":6,"huge":1},{"y":2026,"early":55,"sync":2243,"short":17,"medium":10,"huge":9}],"by_create_year":[{"y":1981,"early":0,"sync":207,"short":0,"medium":0,"huge":4},{"y":1982,"early":0,"sync":350,"short":0,"medium":0,"huge":20},{"y":1983,"early":0,"sync":279,"short":0,"medium":0,"huge":78},{"y":1984,"early":0,"sync":417,"short":0,"medium":0,"huge":23},{"y":1985,"early":0,"sync":475,"short":0,"medium":0,"huge":2},{"y":1986,"early":0,"sync":521,"short":0,"medium":0,"huge":19},{"y":1987,"early":0,"sync":464,"short":0,"medium":0,"huge":54},{"y":1988,"early":0,"sync":427,"short":0,"medium":0,"huge":58},{"y":1989,"early":0,"sync":227,"short":0,"medium":0,"huge":293},{"y":1990,"early":0,"sync":269,"short":0,"medium":0,"huge":268},{"y":1991,"early":0,"sync":238,"short":0,"medium":0,"huge":300},{"y":1992,"early":0,"sync":221,"short":0,"medium":0,"huge":369},{"y":1993,"early":0,"sync":234,"short":1,"medium":0,"huge":351},{"y":1994,"early":0,"sync":217,"short":0,"medium":0,"huge":282},{"y":1995,"early":0,"sync":254,"short":0,"medium":0,"huge":267},{"y":1996,"early":0,"sync":356,"short":0,"medium":0,"huge":314},{"y":1997,"early":0,"sync":397,"short":0,"medium":0,"huge":179},{"y":1998,"early":0,"sync":483,"short":0,"medium":0,"huge":522},{"y":1999,"early":0,"sync":339,"short":0,"medium":0,"huge":321},{"y":2000,"early":0,"sync":391,"short":0,"medium":0,"huge":300},{"y":2001,"early":0,"sync":631,"short":0,"medium":0,"huge":338},{"y":2002,"early":1,"sync":301,"short":0,"medium":0,"huge":661},{"y":2003,"early":0,"sync":386,"short":1,"medium":0,"huge":808},{"y":2004,"early":0,"sync":517,"short":0,"medium":0,"huge":652},{"y":2005,"early":0,"sync":563,"short":0,"medium":0,"huge":779},{"y":2006,"early":0,"sync":427,"short":0,"medium":0,"huge":1035},{"y":2007,"early":0,"sync":455,"short":0,"medium":0,"huge":1208},{"y":2008,"early":0,"sync":261,"short":0,"medium":0,"huge":2166},{"y":2009,"early":0,"sync":271,"short":0,"medium":0,"huge":2289},{"y":2010,"early":0,"sync":376,"short":0,"medium":1533,"huge":704},{"y":2011,"early":12,"sync":1777,"short":289,"medium":489,"huge":12},{"y":2012,"early":7,"sync":2676,"short":238,"medium":5,"huge":11},{"y":2013,"early":4,"sync":2805,"short":80,"medium":27,"huge":14},{"y":2014,"early":4,"sync":2783,"short":125,"medium":57,"huge":2},{"y":2015,"early":13,"sync":4521,"short":42,"medium":4,"huge":2},{"y":2016,"early":5,"sync":4161,"short":100,"medium":0,"huge":1},{"y":2017,"early":292,"sync":3669,"short":246,"medium":1,"huge":8},{"y":2018,"early":663,"sync":3053,"short":98,"medium":12,"huge":2},{"y":2019,"early":556,"sync":3454,"short":50,"medium":0,"huge":2},{"y":2020,"early":431,"sync":3579,"short":66,"medium":1,"huge":1},{"y":2021,"early":546,"sync":3289,"short":55,"medium":5,"huge":4},{"y":2022,"early":430,"sync":3334,"short":73,"medium":20,"huge":8},{"y":2023,"early":82,"sync":3623,"short":74,"medium":11,"huge":3},{"y":2024,"early":101,"sync":3819,"short":113,"medium":12,"huge":2},{"y":2025,"early":77,"sync":4595,"short":92,"medium":8,"huge":1},{"y":2026,"early":69,"sync":2243,"short":17,"medium":3,"huge":0}],"heat_years":[1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026],"heatmap":[[207,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,350,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,279,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,78,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,417,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,475,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,521,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,464,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,427,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,227,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,292,0,0,1,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,269,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,268,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,238,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,300,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,221,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,368,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,235,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,350,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,217,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,282,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,254,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,267,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,356,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,313,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,397,0,0,0,0,0,0,0,0,0,0,0,0,0,0,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,483,0,0,0,0,0,0,0,0,0,0,0,0,10,512,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,339,0,0,0,0,0,0,0,0,0,0,0,19,302,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,391,0,0,0,0,0,0,0,0,0,0,14,286,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,631,0,0,0,0,0,0,0,0,0,27,310,0,0,0,0,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,302,0,0,0,0,0,0,0,0,21,639,1,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,387,0,0,0,0,0,0,0,42,766,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,517,0,0,0,0,0,0,652,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,563,0,0,0,0,0,779,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,427,0,0,0,0,1028,4,0,3,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,455,0,0,0,1205,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,261,0,0,2060,103,1,1,1,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,271,0,2267,17,0,5,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,376,2205,6,22,2,1,0,0,0,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2566,3,0,7,3,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2918,10,7,0,0,0,1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2890,37,1,0,0,1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,2967,1,0,1,0,0,1,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,4577,2,0,1,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,4261,5,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,6,7,4174,26,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3821,5,1,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,4042,2,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,4075,1,1,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1,3885,6,0,1,0,2],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3851,8,5,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,3786,5,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,5,4033,7,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,4761,8],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,3,10,2318]],"groups":{"backfill":{"n":10961,"min":-7305,"max":31,"median":0.0,"mean":-2.3,"p25":0,"p75":0,"p95":0,"p99":0,"same_pct":99.9,"mag_pct":99.8,"exact_eq":10954,"cy_range":[1981,2021]},"batch":{"n":16652,"min":33,"max":11328,"median":1561.0,"mean":2640.4,"p25":708,"p75":4007,"p95":7818,"p99":9220,"same_pct":0.0,"mag_pct":75.2,"exact_eq":0,"cy_range":[1981,2012]},"rest":{"n":58700,"min":-3938,"max":9556,"median":0.0,"mean":2.2,"p25":0,"p75":0,"p95":1,"p99":12,"same_pct":90.9,"mag_pct":27.6,"exact_eq":32552,"cy_range":[1989,2026]}},"batch_months":[["2011-04",10751],["2011-05",27],["2011-06",15],["2011-07",1],["2011-08",10],["2011-09",5],["2011-10",5],["2011-11",3],["2011-12",3],["2012-01",3],["2012-02",2],["2012-03",2],["2012-04",4],["2012-05",6],["2012-06",4262],["2012-07",1430],["2012-09",91],["2012-10",31],["2012-11",1]],"batch_create_years":[[1981,4],[1982,20],[1983,78],[1984,23],[1985,2],[1986,19],[1987,54],[1988,58],[1989,292],[1990,268],[1991,300],[1992,369],[1993,351],[1994,282],[1995,267],[1996,314],[1997,179],[1998,522],[1999,321],[2000,300],[2001,337],[2002,660],[2003,808],[2004,652],[2005,779],[2006,1032],[2007,1207],[2008,2163],[2009,2284],[2010,2211],[2011,491],[2012,5]],"neg":{"total":8503,"dist":[["-1天",5210],["-2天",2947],["-3~-7天",197],["-8~-31天",54],["超過1個月",95]],"mag_pct":93.0},"anomalies":[{"id":"5117157","title":"看見生命的脆弱和堅強《我是遺物整理師》：失去了，愛依然存在","ct":"2021-07-14","ot":"2001-07-14","mag":"","diff":-7305,"typo":true},{"id":"5115315","title":"疫後新商機　報復性結婚，歐美迷你婚禮成主流","ct":"2021-06-21","ot":"2001-06-21","mag":"","diff":-7305,"typo":true},{"id":"5114278","title":"故宮大觀展　世界爭睹罕見珍寶 — 展演新資訊","ct":"2021-04-08","ot":"2007-01-03","mag":"98","diff":-5209,"typo":false},{"id":"5012854","title":"低調拳王，奇襲全球！台灣IC設計，世界不能沒有他們","ct":"2021-08-08","ot":"2007-10-24","mag":"75","diff":-5037,"typo":false},{"id":"5047238","title":"許文龍　失敗責任在我　不能怨","ct":"2023-11-18","ot":"2013-02-05","mag":"1059","diff":-3938,"typo":false},{"id":"5091904","title":"讓他走吧！10個跡象，你該放手了","ct":"2026-03-26","ot":"2018-09-01","mag":"","diff":-2763,"typo":false},{"id":"5095032","title":"巴黎奧運》體操「亞洲貓王」唐嘉鴻：曾經哭著要放棄，每次的失敗都有它的價值","ct":"2024-07-28","ot":"2019-05-07","mag":"","diff":-1909,"typo":false},{"id":"5102417","title":"神秘筆電哪裡來？川普能靠拜登兒子逆轉嗎？","ct":"2020-10-21","ot":"2016-10-21","mag":"","diff":-1461,"typo":true},{"id":"5005423","title":"破解面試時，主管最常問的4大弔詭問題！","ct":"2014-05-23","ot":"2011-04-26","mag":"0","diff":-1123,"typo":false},{"id":"5083376","title":"物質的虛榮只是一時，踏實的過日子才是人生該做的事情","ct":"2017-06-27","ot":"2014-07-23","mag":"0","diff":-1070,"typo":false},{"id":"5083381","title":"不需刻意說出的２件事／莫讓未來遇見更好的人時，用完了最好的自己","ct":"2017-06-27","ot":"2014-08-10","mag":"0","diff":-1052,"typo":false},{"id":"5083382","title":"9把人生之鑰的秘密／一把鑰匙開不了不屬於它的鎖，不要用力硬開","ct":"2017-06-27","ot":"2014-09-20","mag":"0","diff":-1011,"typo":false},{"id":"5011634","title":"60秒讀新聞／快速了解奢侈稅QA","ct":"2013-10-07","ot":"2011-04-28","mag":"0","diff":-893,"typo":false},{"id":"5083379","title":"擺脫旅遊後憂鬱，你需要更多改變的勇氣。","ct":"2017-06-27","ot":"2015-03-26","mag":"0","diff":-824,"typo":false},{"id":"5083775","title":"王盈勛：一個應該改變世界的年輕人，我們卻要他去找份工作？","ct":"2017-07-13","ot":"2015-04-13","mag":"0","diff":-822,"typo":false},{"id":"5083762","title":"【讀者投書】黃小珊：您的小孩該上幼兒園嗎？","ct":"2017-07-12","ot":"2015-05-31","mag":"0","diff":-773,"typo":false},{"id":"5063760","title":"禽流感來襲，民眾如何自保？5點注意、7點小心","ct":"2017-02-12","ot":"2015-01-12","mag":"0","diff":-762,"typo":false},{"id":"5083380","title":"一年換三份工作，卻還不知道自己要什麼？","ct":"2017-06-27","ot":"2015-06-04","mag":"0","diff":-754,"typo":false},{"id":"5130613","title":"連續一週早餐吃燕麥，身體會發生什麼變化？","ct":"2026-03-26","ot":"2024-06-03","mag":"","diff":-661,"typo":false},{"id":"5083761","title":"彭明輝：Maker精神與大學的僵屍制度","ct":"2017-07-12","ot":"2015-11-30","mag":"0","diff":-590,"typo":false},{"id":"5123762","title":"護照過期怎麼辦？申請護照要準備什麼？線上申換護照作法一次看","ct":"2026-03-27","ot":"2024-09-03","mag":"","diff":-570,"typo":false},{"id":"5126090","title":"TPASS通勤月票怎麼買？如何搭？全台方案、票價規定一次看","ct":"2025-02-25","ot":"2023-09-23","mag":"","diff":-521,"typo":false},{"id":"5083806","title":"【投書】曾瓊臻：《重慶森林》──一瓶經典可口的可樂","ct":"2017-07-13","ot":"2016-02-18","mag":"0","diff":-511,"typo":false},{"id":"5083787","title":"黃哲斌：電影《驚爆焦點》沒告訴你的事──小金人光輝下的月球B面","ct":"2017-07-13","ot":"2016-03-03","mag":"0","diff":-497,"typo":false},{"id":"5127980","title":"人氣最高的北榮員工！安寧病房輔助治療犬Oba，如何做到「人做不到」的事？","ct":"2025-03-06","ot":"2023-11-06","mag":"","diff":-486,"typo":false},{"id":"5133439","title":"ASIC是什麼？為何是下一個AI夯股？台廠優勢、最大贏家一次看","ct":"2026-04-21","ot":"2024-12-25","mag":"","diff":-482,"typo":false},{"id":"5083781","title":"黃怡：攀爬聖母峰的的勇氣與運氣","ct":"2017-07-13","ot":"2016-03-26","mag":"0","diff":-474,"typo":false},{"id":"5083780","title":"張家齊：「孩子，對不起，我的生活失控了，我只好控制你」","ct":"2017-07-13","ot":"2016-05-30","mag":"0","diff":-409,"typo":false},{"id":"5117638","title":"用不到的保溫杯、年誌贈品堆滿家裡　生前遺物整理：擁有更少但更好","ct":"2021-08-11","ot":"2020-08-09","mag":"1578","diff":-367,"typo":false},{"id":"5012760","title":"2012上班族快速報稅Q&A，節稅小撇步大公開！","ct":"2012-05-04","ot":"2011-05-04","mag":"0","diff":-366,"typo":true},{"id":"5134388","title":"NotebookLM是什麼？怎麼用？最新功能更新、完整教學、方案一次看","ct":"2026-06-10","ot":"2025-06-10","mag":"","diff":-365,"typo":true},{"id":"5129661","title":"剴剴案再開庭！合格保母卻虐童，監管為何失靈？盤點全台2.5萬個孩子居家托育制度","ct":"2025-03-18","ot":"2024-03-18","mag":"1646","diff":-365,"typo":true},{"id":"5083794","title":"【投書】Chaoshorizon：在菲律賓線上賭場臥底兩年，我想告訴台灣人&hellip;&hellip;","ct":"2017-07-13","ot":"2016-07-22","mag":"0","diff":-356,"typo":false},{"id":"5125998","title":"2025文化幣怎麼領？誰可領？可以買什麼？使用店家與1200點放大術一次看","ct":"2025-01-08","ot":"2024-01-21","mag":"","diff":-353,"typo":false},{"id":"5057675","title":"6成民眾贊成停建核四，但半數不願接受電價調漲","ct":"2015-04-09","ot":"2014-04-29","mag":"0","diff":-345,"typo":false},{"id":"5135559","title":"SEL社會情緒學習是什麼？教育圈最夯關鍵字，和EQ哪裡不一樣？","ct":"2026-03-26","ot":"2025-05-27","mag":"","diff":-303,"typo":false},{"id":"5040956","title":"聰明管理移民政策","ct":"2002-12-01","ot":"2002-02-01","mag":"936","diff":-303,"typo":false},{"id":"5127878","title":"《六人行》「錢德勒」馬修派瑞藥物濫用致死，私人助理等5人遭起訴","ct":"2024-08-16","ot":"2023-10-29","mag":"","diff":-292,"typo":false},{"id":"5125456","title":"台灣AI供應鏈包括哪些公司？3張表看懂","ct":"2024-02-23","ot":"2023-05-25","mag":"","diff":-274,"typo":false},{"id":"5136247","title":"本益比是什麼？怎麼算？本益比多少才合理？","ct":"2026-03-27","ot":"2025-07-07","mag":"","diff":-263,"typo":false},{"id":"5135441","title":"2026 行動電源上飛機最新規範：每人限帶兩顆、機上偷用罰十萬！各航空公司容量限制一次看","ct":"2026-01-26","ot":"2025-05-20","mag":"","diff":-251,"typo":false},{"id":"5083735","title":"紅眼：把美好乘以二──《七月與安生》","ct":"2017-07-12","ot":"2016-12-09","mag":"0","diff":-215,"typo":false},{"id":"5083734","title":"方格正：最美的安排──走過悲傷的4堂課","ct":"2017-07-12","ot":"2016-12-19","mag":"0","diff":-205,"typo":false},{"id":"5083793","title":"恆毅力：應該為你的孩子安排更多課外活動嗎？","ct":"2017-07-13","ot":"2017-01-13","mag":"0","diff":-181,"typo":false},{"id":"5083784","title":"吳英傑：拿了一手好牌，卻打不贏──印尼女孩，你願意到台灣念書嗎？","ct":"2017-07-13","ot":"2017-01-20","mag":"0","diff":-174,"typo":false},{"id":"5083804","title":"紅眼：周星馳的般若波羅密──《西遊．伏妖篇》","ct":"2017-07-13","ot":"2017-02-04","mag":"0","diff":-159,"typo":false},{"id":"5137949","title":"Midjourney免費嗎？怎麼用？2026付費方案、AI製圖教學步驟一次看","ct":"2026-03-27","ot":"2025-10-22","mag":"","diff":-156,"typo":false},{"id":"5138393","title":"Gemini 3 Pro開放免費使用！最新5大功能、使用步驟、方案費用一次看","ct":"2026-04-23","ot":"2025-11-19","mag":"","diff":-155,"typo":false},{"id":"5137909","title":"30歲該存多少錢？理財專家揭「財富自由」一覽表，你在哪個等級？","ct":"2026-03-26","ot":"2025-11-06","mag":"","diff":-140,"typo":false},{"id":"5138441","title":"Nano Banana Pro怎麼用？有哪些功能？免費嗎？與前一代差在哪？","ct":"2026-03-27","ot":"2025-11-21","mag":"","diff":-126,"typo":false},{"id":"5127229","title":"日本石川大地震　強震機率高達七成！日本如何為下一場大地震做準備？","ct":"2024-01-02","ot":"2023-09-05","mag":"1632","diff":-119,"typo":false},{"id":"5083820","title":"【投書】林昭禎：勞保年金改革的「三公四不義」，請釐清真相、積極轉型！","ct":"2017-07-13","ot":"2017-03-16","mag":"0","diff":-119,"typo":false},{"id":"5083759","title":"【哲學諮商室】褚士瑩：什麼樣的人不認識自己？","ct":"2017-07-12","ot":"2017-03-26","mag":"0","diff":-108,"typo":false},{"id":"5135278","title":"台灣多放4+1天假！總統府公布法令，新增的假有哪些？","ct":"2026-04-09","ot":"2025-12-23","mag":"","diff":-107,"typo":false},{"id":"5136369","title":"海底電纜是什麼？運作方式為何？2026斷裂次數與影響一次看","ct":"2026-03-26","ot":"2025-12-11","mag":"","diff":-105,"typo":false},{"id":"5083758","title":"吳英傑：印尼「神力女超人」──海洋部長蘇西","ct":"2017-07-12","ot":"2017-03-30","mag":"0","diff":-104,"typo":false},{"id":"5083777","title":"吳老拍：「毫無保留，就會長出自己的花朵」──《白蟻：慾望謎網》影評與導演朱賢哲專訪","ct":"2017-07-13","ot":"2017-04-01","mag":"0","diff":-103,"typo":false},{"id":"5083739","title":"侯勝宗：家長們，請放手讓孩子「向下移動」吧！","ct":"2017-07-12","ot":"2017-04-02","mag":"0","diff":-101,"typo":false},{"id":"5083728","title":"林蔚昀：回家Powr&oacute;t──在異鄉住了半輩子以後，重新學習在故鄉獨立","ct":"2017-07-12","ot":"2017-04-04","mag":"0","diff":-99,"typo":false},{"id":"5083796","title":"張家齊：你聽見了嗎？我憂鬱言語背後的那股怒氣","ct":"2017-07-13","ot":"2017-04-06","mag":"0","diff":-98,"typo":false},{"id":"5083789","title":"【投書】盧宸緯：在人才的流動之間，台灣選擇的是&hellip;&hellip;？","ct":"2017-07-13","ot":"2017-04-07","mag":"0","diff":-97,"typo":false},{"id":"5083821","title":"【投書】謝昆霖：達文西計畫，讓「真實學習」重組你想像中的「教育」！","ct":"2017-07-13","ot":"2017-04-08","mag":"0","diff":-96,"typo":false},{"id":"5083778","title":"楊雅華：一個社工觀看《月光下的藍色男孩》的心痛　每一張面孔都那麼熟悉","ct":"2017-07-13","ot":"2017-04-09","mag":"0","diff":-95,"typo":false},{"id":"5083748","title":"魚夫：豈只將軍之屋而已，這裡是對華、南方作戰的基地","ct":"2017-07-12","ot":"2017-04-08","mag":"0","diff":-95,"typo":false},{"id":"5083795","title":"【投書】陳柏志：你所不知道的「曉江亭」──曉江亭的文資價值","ct":"2017-07-13","ot":"2017-04-10","mag":"0","diff":-94,"typo":false},{"id":"5083717","title":"【哲學諮商室】褚士瑩：為什麼一直找不到那個「對的人」？","ct":"2017-07-12","ot":"2017-04-09","mag":"0","diff":-94,"typo":false},{"id":"5083738","title":"劉政暉：別讓他們繼續沉默──那些隱藏在生活縫隙裡的階級意識","ct":"2017-07-12","ot":"2017-04-10","mag":"0","diff":-93,"typo":false},{"id":"5083729","title":"楊惠君：那些印度的冠軍女兒","ct":"2017-07-12","ot":"2017-04-11","mag":"0","diff":-92,"typo":false},{"id":"5083723","title":"黃哲斌：為何網路像蝨子一樣咬我的背？──美好科技年代的四個恐怖故事","ct":"2017-07-07","ot":"2017-04-08","mag":"0","diff":-90,"typo":false},{"id":"5083721","title":"【投書】林秋芬：從通靈少女中的「小男孩卡到陰」，看父母衝突下孩子的身心反應","ct":"2017-07-12","ot":"2017-04-13","mag":"0","diff":-90,"typo":false},{"id":"5083807","title":"陳玉敏：動物，可以是你的「臉友」嗎？","ct":"2017-07-13","ot":"2017-04-15","mag":"0","diff":-89,"typo":false},{"id":"5083790","title":"裴家騏：原住民獵場管理與野生動物保育的夥伴關係","ct":"2017-07-13","ot":"2017-04-15","mag":"0","diff":-89,"typo":false},{"id":"5083726","title":"人生本來就是塗塗改改：爛工作或許能磨練，但別待太久！","ct":"2017-07-12","ot":"2017-04-14","mag":"0","diff":-89,"typo":false},{"id":"5083786","title":"魏宏晉：有情來下種，因地果還生","ct":"2017-07-13","ot":"2017-04-16","mag":"0","diff":-88,"typo":false},{"id":"5083756","title":"何萬順：千萬，不要以分數決定你的未來！","ct":"2017-07-12","ot":"2017-04-15","mag":"0","diff":-88,"typo":false},{"id":"5083788","title":"【投書】紀岳良：安寧醫療，也許只是讓人錯認從此無須安樂死","ct":"2017-07-13","ot":"2017-04-18","mag":"0","diff":-86,"typo":false},{"id":"5083776","title":"人生學校：我愛身份地位──渴望成功的背後，你真正想要的是什麼？","ct":"2017-07-13","ot":"2017-04-18","mag":"0","diff":-86,"typo":false},{"id":"5083757","title":"方格正：對待孩子，聽「教養專家」的話就對了嗎？","ct":"2017-07-12","ot":"2017-04-18","mag":"0","diff":-85,"typo":false},{"id":"5083722","title":"許文泰：從香港地鐵看台灣的軌道預算大亂鬥","ct":"2017-07-12","ot":"2017-04-18","mag":"0","diff":-85,"typo":false},{"id":"5139217","title":"高股息ETF是什麼？優缺點、挑選方式、熱門選項與常見FAQ一次看","ct":"2026-03-27","ot":"2026-01-02","mag":"","diff":-84,"typo":false},{"id":"5083779","title":"【投書】陳展宇：「老師，我的孩子就交給您了！」名師，其實是家長的迷思","ct":"2017-07-13","ot":"2017-04-21","mag":"0","diff":-83,"typo":false},{"id":"5083715","title":"周恬弘：當醫生真的是一份好工作嗎？","ct":"2017-07-12","ot":"2017-04-20","mag":"0","diff":-83,"typo":false},{"id":"5083760","title":"魚夫：高堂明鏡悲白髮──下淡水溪橋","ct":"2017-07-12","ot":"2017-04-22","mag":"0","diff":-81,"typo":false},{"id":"5083750","title":"【哲學諮商室】褚士瑩：不知道要吃什麼的時候，先吃「一點」麥當勞，這樣好嗎？","ct":"2017-07-12","ot":"2017-04-23","mag":"0","diff":-80,"typo":false},{"id":"5069111","title":"颱風天老闆叫你上班　你可以怎麼辦","ct":"2015-09-28","ot":"2015-07-11","mag":"0","diff":-79,"typo":false},{"id":"5083732","title":"林劭寰：低薪、過勞、高風險──在菲律賓，你的每份工作可能都只有6個月","ct":"2017-07-12","ot":"2017-04-25","mag":"0","diff":-78,"typo":false},{"id":"5083792","title":"吳英傑：看見爪哇的溫柔力量──電影《卡媞妮》與爪哇文化","ct":"2017-07-13","ot":"2017-04-27","mag":"0","diff":-77,"typo":false},{"id":"5083737","title":"李永展：別讓「馬祖藍眼淚」變成「馬祖掉眼淚」","ct":"2017-07-12","ot":"2017-04-26","mag":"0","diff":-77,"typo":false},{"id":"5083755","title":"杜冠霖：每年採訪滿級分的高中生，到底有什麼意義？","ct":"2017-07-12","ot":"2017-04-27","mag":"0","diff":-76,"typo":false},{"id":"5139874","title":"木原龍一、三浦璃來故事超勵志！一位瀕臨退役老將，如何攜手年輕新秀登上奧運王座？","ct":"2026-04-29","ot":"2026-02-23","mag":"","diff":-65,"typo":false},{"id":"5139485","title":"ChatGPT Go新方案！290元就能訂閱，功能、價格與適合族群一次看","ct":"2026-03-27","ot":"2026-01-21","mag":"","diff":-65,"typo":false},{"id":"5126602","title":"囤房稅2.0一次比較清楚！多屋族、建商怎麼課稅？房價會跌嗎？","ct":"2024-02-22","ot":"2023-12-19","mag":"0","diff":-65,"typo":false},{"id":"5133528","title":"114學測成績怎麼查？多元入學管道有哪些？考招新制、分科測驗時程一次看","ct":"2025-02-25","ot":"2025-01-03","mag":"","diff":-53,"typo":false},{"id":"5139461","title":"2026台灣燈會在嘉義》3月3日煙火秀！時間地點、主燈亮點、必逛展區一次看","ct":"2026-03-03","ot":"2026-01-20","mag":"","diff":-42,"typo":false},{"id":"5121071","title":"不能再生的家具就下架！IKEA大膽推「以租代買」，先把獲利放一邊？","ct":"2022-06-15","ot":"2022-05-05","mag":"0","diff":-41,"typo":false}],"anom_typo_n":6,"anom_stats":{"n":95,"min":-7305,"max":-41,"median":-155.0,"mean":-619.4,"p25":-497,"p75":-89,"p95":-65,"p99":-41},"mode":{"0":85897,"1":214,"2":202},"display_impact":{"n":21855,"by_grp":{"backfill":7,"batch":16652,"rest":5196}},"resid":{"n":273,"by_oy":[[2013,30],[2014,118],[2015,12],[2017,2],[2018,22],[2019,2],[2020,3],[2021,3],[2022,21],[2023,16],[2024,18],[2025,7],[2026,19]]}};
+
+const CLS = [
+  {k:'sync',  name:'同步（±1天）',      c:'var(--c-sync)'},
+  {k:'early', name:'提前上線（早2天以上）', c:'var(--c-early)'},
+  {k:'short', name:'小延遲（2–31天）',   c:'var(--c-short)'},
+  {k:'medium',name:'中延遲（1月–1年）',  c:'var(--c-medium)'},
+  {k:'huge',  name:'大延遲（>1年）',    c:'var(--c-huge)'}
+];
+const fmt = n => n.toLocaleString('en-US');
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+function sv(tag, at, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in at) e.setAttribute(k, at[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+/* ---------- tooltip ---------- */
+const tip = $('#tip');
+function showTip(html, x, y){
+  tip.innerHTML = html; tip.style.display = 'block';
+  const r = tip.getBoundingClientRect();
+  let L = x + 14, T = y + 14;
+  if (L + r.width > innerWidth - 8) L = x - r.width - 14;
+  if (T + r.height > innerHeight - 8) T = y - r.height - 14;
+  tip.style.left = L + 'px'; tip.style.top = T + 'px';
+}
+function hideTip(){ tip.style.display = 'none'; }
+function tipRow(color, label, val){
+  const row = document.createElement('div'); row.className = 'row';
+  const key = document.createElement('span'); key.className = 'key'; key.style.background = color;
+  const v = document.createElement('span'); v.className = 'v'; v.textContent = fmt(val);
+  const l = document.createElement('span'); l.className = 'l'; l.textContent = label;
+  row.append(key, v, l); return row;
+}
+function tipBox(title, rows){
+  const box = document.createElement('div');
+  const t = document.createElement('div'); t.className = 't'; t.textContent = title;
+  box.appendChild(t); rows.forEach(r => box.appendChild(r));
+  return box.innerHTML;
+}
+
+/* ---------- KPI row ---------- */
+(function(){
+  const k = [
+    {lab:'文章總數', val:fmt(DATA.meta.total), sub:'1981–2026 年出版'},
+    {lab:'同步（±1 天）', val:'74.5%', sub:fmt(DATA.class_counts.sync)+' 篇，日期一致', cls:'ok'},
+    {lab:'批次匯入、未回填', val:fmt(DATA.groups.batch.n), sub:'上線日=匯入日，前台顯示失真', cls:'flag'},
+    {lab:'已回填的老文章', val:fmt(DATA.groups.backfill.n), sub:'上線日已設為出版日，顯示正常', cls:'ok'},
+    {lab:'疑似日期登打錯誤', val:fmt(DATA.anomalies.length), sub:'上線早於出版逾 1 個月', cls:'flag'}
+  ];
+  $('#kpis').innerHTML = k.map(x =>
+    `<div class="kpi ${x.cls||''}"><div class="lab">${x.lab}</div><div class="val">${x.val}</div><div class="sub">${x.sub}</div></div>`
+  ).join('');
+})();
+
+/* ---------- chart/table toggles ---------- */
+document.querySelectorAll('.toggles[data-for]').forEach(tg => {
+  const id = tg.dataset.for;
+  const [bc, bt] = tg.querySelectorAll('button');
+  const chart = document.getElementById(id + '-chart');
+  const table = document.getElementById(id + '-table');
+  bc.onclick = () => { bc.classList.add('on'); bt.classList.remove('on'); chart.classList.remove('off'); table.classList.remove('on'); };
+  bt.onclick = () => { bt.classList.add('on'); bc.classList.remove('on'); chart.classList.add('off'); table.classList.add('on'); };
+});
+
+/* ---------- 01 histogram ---------- */
+(function(){
+  const H = DATA.hist, max = Math.max(...H.map(d => d.n));
+  const W = 940, rowH = 30, labW = 96, valW = 76, top = 4;
+  const height = top + H.length * rowH + 8;
+  const root = $('#hist-chart');
+  root.classList.add('chart-scroll');
+  const svg = sv('svg', {viewBox:`0 0 ${W} ${height}`, style:'min-width:640px;width:100%;height:auto'}, root);
+  const plotW = W - labW - valW - 16;
+  function colorOf(lb){
+    if (lb === '±1天') return 'var(--c-sync)';
+    if (lb.startsWith('-') || lb.startsWith('<-')) return 'var(--c-early)';
+    if (lb === '2~7天' || lb === '8~31天') return 'var(--c-short)';
+    if (lb === '1月~1年') return 'var(--c-medium)';
+    return 'var(--c-huge)';
+  }
+  H.forEach((d, i) => {
+    const y = top + i * rowH;
+    sv('text', {x:labW - 8, y:y + rowH/2 + 4, 'text-anchor':'end', class:'axis-t'}, svg).textContent = d.label;
+    const w = Math.max(d.n / max * plotW, d.n > 0 ? 2 : 0);
+    const bar = sv('rect', {x:labW, y:y + 5, width:w, height:rowH - 12, rx:4, fill:colorOf(d.label)}, svg);
+    sv('text', {x:labW + w + 8, y:y + rowH/2 + 4, class:'bar-lab'}, svg).textContent = fmt(d.n);
+    const hit = sv('rect', {x:0, y:y, width:W, height:rowH, fill:'transparent'}, svg);
+    hit.addEventListener('pointermove', e => showTip(tipBox('落差 ' + d.label,
+      [tipRow(getComputedStyle(bar).fill, '篇（' + (100*d.n/DATA.meta.total).toFixed(1) + '%）', d.n)]), e.clientX, e.clientY));
+    hit.addEventListener('pointerleave', hideTip);
+  });
+  // table view
+  const t = document.createElement('table');
+  t.innerHTML = '<thead><tr><th>落差區間</th><th>篇數</th><th>占比</th></tr></thead>';
+  const tb = document.createElement('tbody');
+  H.forEach(d => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${d.label}</td><td>${fmt(d.n)}</td><td>${(100*d.n/DATA.meta.total).toFixed(2)}%</td>`;
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); $('#hist-table').appendChild(t);
+})();
+
+/* ---------- 01 stats table ---------- */
+(function(){
+  const rows = [
+    ['全部文章', DATA.overall],
+    ['回填組（上線年 ≤ 2010）', DATA.groups.backfill],
+    ['批次匯入組（2011–12 上線且落差 >31 天）', DATA.groups.batch],
+    ['日常營運組（其餘）', DATA.groups.rest],
+    ['疑似日期錯誤（上線早於出版逾 1 個月）*', DATA.anom_stats]
+  ];
+  const h = '<thead><tr><th>範圍</th><th>篇數</th><th>佔總文章</th><th>中位數</th><th>平均</th><th>P25</th><th>P75</th><th>P95</th><th>最小</th><th>最大</th></tr></thead>';
+  const b = rows.map(([name, s]) =>
+    `<tr><td>${name}</td><td>${fmt(s.n)}</td><td>${(100*s.n/DATA.meta.total).toFixed(s.n < 1000 ? 2 : 1)}%</td><td>${fmt(s.median)}</td><td>${fmt(s.mean)}</td><td>${fmt(s.p25)}</td><td>${fmt(s.p75)}</td><td>${fmt(s.p95)}</td><td>${fmt(s.min)}</td><td>${fmt(s.max)}</td></tr>`
+  ).join('');
+  $('#stat-table').innerHTML = h + '<tbody>' + b + '</tbody>';
+})();
+
+/* ---------- 02 stacked timeline ---------- */
+(function(){
+  const legend = $('#tl-legend');
+  legend.innerHTML = CLS.map(c => `<span class="it"><span class="sw" style="background:${c.c}"></span>${c.name}</span>`).join('');
+  const root = $('#tl-chart');
+  let mode = 'oy';
+
+  function render(){
+    root.innerHTML = '';
+    const rows = mode === 'oy' ? DATA.by_online_year : DATA.by_create_year;
+    const W = 960, Hh = 320, mL = 52, mR = 10, mT = 12, mB = 30;
+    const pw = W - mL - mR, ph = Hh - mT - mB;
+    const max = Math.max(...rows.map(r => CLS.reduce((s, c) => s + r[c.k], 0)));
+    const step = Math.ceil(max / 4 / 1000) * 1000;
+    const yMax = step * 4;
+    const svg = sv('svg', {viewBox:`0 0 ${W} ${Hh}`, style:'min-width:720px;width:100%;height:auto'}, root);
+    // grid + y ticks
+    for (let v = 0; v <= yMax; v += step){
+      const y = mT + ph - v / yMax * ph;
+      sv('line', {x1:mL, x2:W - mR, y1:y, y2:y, stroke: v === 0 ? 'var(--baseline)' : 'var(--grid)', 'stroke-width':1}, svg);
+      sv('text', {x:mL - 8, y:y + 4, 'text-anchor':'end', class:'axis-t'}, svg).textContent = fmt(v);
+    }
+    const bw = pw / rows.length;
+    const barW = Math.min(bw - 3, 24);
+    rows.forEach((r, i) => {
+      const x = mL + i * bw + (bw - barW) / 2;
+      let acc = 0;
+      CLS.forEach(c => {
+        const v = r[c.k]; if (!v) return;
+        const hpx = v / yMax * ph;
+        const y1 = mT + ph - (acc + v) / yMax * ph;
+        acc += v;
+        sv('rect', {x, y:y1 + 1, width:barW, height:Math.max(hpx - 2, .8), fill:c.c}, svg);
+      });
+      if (r.y % 5 === 0)
+        sv('text', {x:x + barW/2, y:Hh - 8, 'text-anchor':'middle', class:'axis-t'}, svg).textContent = r.y;
+      const total = CLS.reduce((s, c) => s + r[c.k], 0);
+      const hit = sv('rect', {x:mL + i * bw, y:mT, width:bw, height:ph + mB, fill:'transparent'}, svg);
+      hit.addEventListener('pointermove', e => {
+        showTip(tipBox((mode === 'oy' ? '上線於 ' : '出版於 ') + r.y + ' 年 · 共 ' + fmt(total) + ' 篇',
+          CLS.filter(c => r[c.k] > 0).map(c => tipRow(cssColor(c.c), c.name, r[c.k]))), e.clientX, e.clientY);
+      });
+      hit.addEventListener('pointerleave', hideTip);
+    });
+    $('#tl-sub').textContent = mode === 'oy' ? '依上線年份（onlineTime）' : '依出版年份（createTime）';
+    renderTable(rows);
+  }
+  function cssColor(v){
+    return getComputedStyle(document.documentElement).getPropertyValue(v.replace('var(', '').replace(')', '')).trim() || v;
+  }
+  function renderTable(rows){
+    const box = $('#tl-table'); box.innerHTML = '';
+    const wrap = document.createElement('div'); wrap.className = 'scrolltbl';
+    const t = document.createElement('table');
+    t.innerHTML = `<thead><tr><th>${mode === 'oy' ? '上線年' : '出版年'}</th>` +
+      CLS.map(c => `<th>${c.name}</th>`).join('') + '<th>合計</th></tr></thead>';
+    const tb = document.createElement('tbody');
+    rows.forEach(r => {
+      const total = CLS.reduce((s, c) => s + r[c.k], 0);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.y}</td>` + CLS.map(c => `<td>${fmt(r[c.k])}</td>`).join('') + `<td><b>${fmt(total)}</b></td>`;
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); box.appendChild(wrap);
+  }
+  document.querySelectorAll('#tl-mode button').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll('#tl-mode button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); mode = b.dataset.m; render();
+    };
+  });
+  const mq = matchMedia('(prefers-color-scheme: dark)');
+  mq.addEventListener('change', render);
+  new MutationObserver(render).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+  render();
+})();
+
+/* ---------- 03 heatmap ---------- */
+(function(){
+  const Y = DATA.heat_years, M = DATA.heatmap;
+  const cell = 15, gap = 1, axL = 44, axT = 24, axB = 26, axR = 8;
+  const n = Y.length;
+  const W = axL + n * (cell + gap) + axR, Hh = axT + n * (cell + gap) + axB + 14;
+  const root = $('#heat-chart');
+  const svg = sv('svg', {viewBox:`0 0 ${W} ${Hh}`, style:`min-width:${Math.min(W, 900)}px;width:100%;max-width:${W}px;height:auto`}, root);
+  let max = 0;
+  M.forEach(row => row.forEach(v => { if (v > max) max = v; }));
+  const ramp = ['--seq0','--seq1','--seq2','--seq3','--seq4','--seq5','--seq6','--seq7'];
+  function color(v){
+    if (v === 0) return 'transparent';
+    const t = Math.sqrt(v / max);
+    const idx = Math.min(1 + Math.floor(t * 7), 7);
+    return `var(${ramp[idx]})`;
+  }
+  // axis labels
+  Y.forEach((y, i) => {
+    if (y % 5 === 0){
+      sv('text', {x:axL + i * (cell + gap) + cell/2, y:axT + n * (cell + gap) + 16, 'text-anchor':'middle', class:'axis-t'}, svg).textContent = y;
+      sv('text', {x:axL - 6, y:axT + i * (cell + gap) + cell/2 + 4, 'text-anchor':'end', class:'axis-t'}, svg).textContent = y;
+    }
+  });
+  sv('text', {x:axL + n*(cell+gap)/2, y:Hh - 2, 'text-anchor':'middle', class:'axis-t', 'font-weight':600}, svg).textContent = '上線年份 →';
+  sv('text', {x:2, y:axT - 8, 'text-anchor':'start', class:'axis-t', 'font-weight':600}, svg).textContent = '出版年份 ↓';
+  // cells
+  Y.forEach((cy, r) => {
+    Y.forEach((oy, c) => {
+      const v = M[r][c];
+      const x = axL + c * (cell + gap), y = axT + r * (cell + gap);
+      if (cy === oy) sv('rect', {x:x-.5, y:y-.5, width:cell+1, height:cell+1, fill:'none', stroke:'var(--grid)', 'stroke-width':1}, svg);
+      if (v === 0) return;
+      const rc = sv('rect', {x, y, width:cell, height:cell, rx:2, fill:color(v)}, svg);
+      rc.addEventListener('pointermove', e => {
+        rc.setAttribute('stroke', 'var(--ink)'); rc.setAttribute('stroke-width', '1.5');
+        showTip(`<div class="t">出版 ${cy} → 上線 ${oy}</div><div class="row"><span class="v">${fmt(v)}</span><span class="l">篇</span></div>`, e.clientX, e.clientY);
+      });
+      rc.addEventListener('pointerleave', () => { rc.removeAttribute('stroke'); hideTip(); });
+    });
+  });
+  // annotation: vertical band 2011-2012 (batch import)
+  const i11 = Y.indexOf(2011);
+  sv('rect', {x:axL + i11*(cell+gap) - 1, y:axT - 1, width:2*(cell+gap) + 1, height:n*(cell+gap) + 1,
+    fill:'none', stroke:'var(--c-huge)', 'stroke-width':1.5, rx:3}, svg);
+  const lb = sv('text', {x:axL + i11*(cell+gap) + cell + gap, y:axT - 8, class:'axis-t', 'text-anchor':'middle',
+    style:'fill:var(--c-huge);font-weight:600'}, svg);
+  lb.textContent = '批次匯入 2011–12';
+})();
+
+/* ---------- 04 group cards ---------- */
+(function(){
+  const g = DATA.groups;
+  const cards = [
+    {key:'backfill', color:'var(--c-sync)', title:'回填組 — 已修正的老文章',
+     n:g.backfill.n,
+     desc:'數位化時（或後續整理時）onlineTime 被直接寫成 createTime，兩者 99.9% 完全相同。前台顯示的日期就是出版日期，<b>無需處理</b>。',
+     cond:"YEAR(onlineTime) <= 2010",
+     stats:[['落差中位數','0 天'],['日期完全相同','99.9%'],['有雜誌編號','99.8%']]},
+    {key:'batch', color:'var(--c-huge)', title:'批次匯入組 — 問題主體',
+     n:g.batch.n,
+     desc:'兩波匯入：<b>2011 年 4 月（10,751 篇）</b>與 <b>2012 年 6–7 月（約 5,700 篇）</b>。onlineTime 記錄的是匯入作業日，出版年橫跨 1981–2011。前台顯示年份與真實出版年中位數差 <b>4.3 年</b>（平均 7.2 年），<b>建議回填</b>。',
+     cond:"onlineTime >= '2011-01-01' AND YEAR(onlineTime) <= 2012 AND DATEDIFF(onlineTime, createTime) > 31",
+     stats:[['落差中位數','1,561 天'],['落差最大','約 30 年'],['有雜誌編號','75.2%']]},
+    {key:'rest', color:'var(--c-early)', title:'日常營運組 — 大致正常',
+     n:g.rest.n,
+     desc:'2013 年後的日常發稿節奏：90.9% 在 ±1 天內；提前 1–2 天上線是雜誌上市節奏的常態。僅 273 篇有超過一個月的零星延遲（補登舊稿），可抽查即可。',
+     cond:"其餘所有文章",
+     stats:[['落差中位數','0 天'],['±1 天內','90.9%'],['>31 天延遲','273 篇']]}
+  ];
+  $('#groups').innerHTML = cards.map(c => `
+    <div class="gcard" style="--gc:${c.color}">
+      <h3>${c.title}</h3>
+      <div class="n">${fmt(c.n)} <span class="pct">篇 · ${(100*c.n/DATA.meta.total).toFixed(1)}%</span></div>
+      <p>${c.desc}</p>
+      <div class="gstats">${c.stats.map(s => `<span><b>${s[1]}</b>${s[0]}</span>`).join('')}</div>
+      <div class="cond">${c.cond}</div>
+    </div>`).join('');
+})();
+
+/* ---------- 05 negative dist ---------- */
+(function(){
+  const D = DATA.neg.dist, max = Math.max(...D.map(d => d[1]));
+  const W = 940, rowH = 30, labW = 96, top = 4;
+  const height = top + D.length * rowH + 8;
+  const root = $('#neg-chart'); root.classList.add('chart-scroll');
+  const svg = sv('svg', {viewBox:`0 0 ${W} ${height}`, style:'min-width:600px;width:100%;height:auto'}, root);
+  const plotW = W - labW - 90;
+  D.forEach((d, i) => {
+    const y = top + i * rowH;
+    const isBad = d[0] === '超過1個月';
+    sv('text', {x:labW - 8, y:y + rowH/2 + 4, 'text-anchor':'end', class:'axis-t'}, svg).textContent = d[0];
+    const w = Math.max(d[1] / max * plotW, d[1] > 0 ? 2 : 0);
+    sv('rect', {x:labW, y:y + 5, width:w, height:rowH - 12, rx:4, fill:isBad ? 'var(--c-huge)' : 'var(--c-early)'}, svg);
+    sv('text', {x:labW + w + 8, y:y + rowH/2 + 4, class:'bar-lab'}, svg).textContent =
+      fmt(d[1]) + (isBad ? ' ← 疑似錯誤' : '');
+  });
+})();
+
+/* ---------- 05 anomaly table ---------- */
+(function(){
+  const t = document.createElement('table');
+  t.innerHTML = '<thead><tr><th>文章 ID</th><th>文章標題</th><th>出版日期</th><th>上線日期</th><th>落差（天）</th><th>雜誌編號</th></tr></thead>';
+  const tb = document.createElement('tbody');
+  DATA.anomalies.forEach(a => {
+    const tr = document.createElement('tr');
+    const tdId = document.createElement('td'); tdId.textContent = a.id;
+    const tdTitle = document.createElement('td');
+    tdTitle.style.cssText = 'white-space:normal;min-width:240px;max-width:380px;text-align:left;line-height:1.5';
+    const link = document.createElement('a');
+    link.href = 'http://www.cw.com.tw/article/' + encodeURIComponent(a.id);
+    link.target = '_blank'; link.rel = 'noopener';
+    link.textContent = a.title || '（無標題）';
+    tdTitle.appendChild(link);
+    const tdCt = document.createElement('td'); tdCt.textContent = a.ct;
+    const tdOt = document.createElement('td'); tdOt.textContent = a.ot;
+    const tdDiff = document.createElement('td'); tdDiff.textContent = fmt(a.diff); tdDiff.style.color = 'var(--c-huge)';
+    const tdMag = document.createElement('td'); tdMag.textContent = a.mag || '—';
+    tr.append(tdId, tdTitle, tdCt, tdOt, tdDiff, tdMag);
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); $('#anom-table').appendChild(t);
+})();
+
+</script>
