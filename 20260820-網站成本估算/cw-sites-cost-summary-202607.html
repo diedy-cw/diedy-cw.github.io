@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cw.com.tw 站群成本總表</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F6F8F8; --card:#FFFFFF; --ink:#1E2A2A; --muted:#5D6B6B;
+  --line:#DBE2E1; --line-soft:#E7ECEB;
+  --acc:#0E6E6E; --acc-soft:#E6F2F1;
+  --warn-bg:#FBF3E4; --warn-ink:#8A6215;
+  --chip-bg:#EDF1F0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#141918; --card:#1C2221; --ink:#E3E9E8; --muted:#95A3A1;
+    --line:#323B3A; --line-soft:#272E2D;
+    --acc:#5BC0BC; --acc-soft:#16302E;
+    --warn-bg:#2E2718; --warn-ink:#D9B564;
+    --chip-bg:#252C2B;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#141918; --card:#1C2221; --ink:#E3E9E8; --muted:#95A3A1;
+  --line:#323B3A; --line-soft:#272E2D;
+  --acc:#5BC0BC; --acc-soft:#16302E;
+  --warn-bg:#2E2718; --warn-ink:#D9B564;
+  --chip-bg:#252C2B;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:15px; line-height:1.75;
+}
+.wrap{max-width:980px; margin:0 auto; padding:48px 28px 80px}
+.mono{font-family:"IBM Plex Mono","Noto Sans TC",monospace}
+.eyebrow{
+  font-size:12px; letter-spacing:.14em; color:var(--muted);
+  text-transform:uppercase; font-weight:500; margin-bottom:10px;
+  font-family:"IBM Plex Mono",monospace;
+}
+h1{font-size:30px; font-weight:900; margin:0 0 6px; line-height:1.3; text-wrap:balance}
+.sub{color:var(--muted); margin:0 0 36px; max-width:64ch}
+h2{font-size:19px; font-weight:700; margin:52px 0 6px; text-wrap:balance}
+h2 .no{color:var(--muted); font-weight:500; font-family:"IBM Plex Mono",monospace; font-size:15px; margin-right:8px}
+.h2note{color:var(--muted); font-size:13.5px; margin:0 0 16px}
+p{margin:10px 0; max-width:70ch}
+
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:26px 0 8px}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  padding:20px 22px; border-top:3px solid var(--acc);
+}
+.card .site{font-weight:700; font-size:15px; margin-bottom:2px; color:var(--acc)}
+.card .host{font-size:12px; color:var(--muted); font-family:"IBM Plex Mono",monospace}
+.card .amt{font-size:29px; font-weight:900; margin:12px 0 0; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
+.card .amt small{font-size:14px; font-weight:500; color:var(--muted)}
+.card .split{font-size:13px; color:var(--muted); margin-top:6px; font-variant-numeric:tabular-nums}
+
+.tablewrap{overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:10px; margin:14px 0}
+table{border-collapse:collapse; width:100%; min-width:640px; font-size:14px}
+th{
+  text-align:left; font-size:12px; letter-spacing:.06em; color:var(--muted); font-weight:500;
+  padding:12px 14px 8px; border-bottom:1px solid var(--line); white-space:nowrap;
+}
+td{padding:8px 14px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+tr.sum td{border-top:1.5px solid var(--line); font-weight:700; background:var(--chip-bg)}
+tr.hero td{background:var(--acc-soft)}
+td .dim{color:var(--muted); font-size:12.5px}
+.c-acc{color:var(--acc); font-weight:600}
+
+.callout{
+  background:var(--warn-bg); color:var(--warn-ink); border-radius:10px;
+  padding:14px 18px; font-size:14px; margin:18px 0; max-width:none;
+}
+.callout b{font-weight:700}
+ol.assump{padding-left:22px; margin:12px 0}
+ol.assump li{margin:9px 0; max-width:78ch}
+ol.assump li b{font-weight:700}
+.foot{
+  margin-top:56px; padding-top:18px; border-top:1px solid var(--line);
+  color:var(--muted); font-size:12.5px; font-family:"IBM Plex Mono",monospace;
+}
+.insight{
+  border-left:3px solid var(--acc); background:var(--acc-soft);
+  padding:12px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14px; max-width:none;
+}
+a{color:var(--acc)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">cwgroup infra · 成本分攤估算 · 資料月份 2026-07</div>
+  <h1>cw.com.tw 站群 11 產品成本總表</h1>
+  <p class="sub">天下站群共用 GCP 資源（cw-web-prod ＋ cw-web-dev）與 Cloudflare 合約（NT$ 50 萬/月），本表以同一套分攤框架把 11 個產品的月成本拆開：GKE 用 CPU requests、DB/Logging 用回源請求、網路用回源 bytes、CF 用全 account 請求佔比，共用縮圖機依 Referer 實測歸戶。<b>口徑互斥、可直接加總</b>。金額為台幣含稅，CF 採請求數基礎。</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="site">11 產品月合計</div>
+      <div class="host">年化約 NT$ 438 萬</div>
+      <div class="amt">NT$ 364,705<small> /月</small></div>
+      <div class="split">GCP 正式 99,647 ＋ 測試 10,294 ＋ CF 254,764</div>
+    </div>
+    <div class="card">
+      <div class="site">覆蓋率</div>
+      <div class="host">cw-web-prod 正式環境費用</div>
+      <div class="amt">85.2%</div>
+      <div class="split">其餘為共用 API、App 後端與未列產品</div>
+    </div>
+    <div class="card">
+      <div class="site">CF 份額合計</div>
+      <div class="host">佔 50 萬合約</div>
+      <div class="amt">51.0%</div>
+      <div class="split">bytes 口徑則為 41.0%（205,134）</div>
+    </div>
+  </div>
+
+  <h2><span class="no">1</span>總表（依月成本排序）</h2>
+  <div class="tablewrap"><table>
+    <tr><th>產品</th><th class="n">GCP 正式</th><th class="n">GCP 測試</th><th class="n">CF 份額</th><th class="n c-acc">月計（請求口徑）</th><th class="n">月計（bytes 口徑）</th></tr>
+    <tr class="hero"><td>www 天下官網 <span class="dim">含 cdn-www／uat／api-web／CMS；此處不含 web</span></td><td class="n">73,797</td><td class="n">1,795</td><td class="n">181,813</td><td class="n">257,405</td><td class="n">250,603</td></tr>
+    <tr><td>crossing 換日線</td><td class="n">6,942</td><td class="n">798</td><td class="n">24,776</td><td class="n">32,516</td><td class="n">14,856</td></tr>
+    <tr><td>smiletaiwan 微笑台灣</td><td class="n">5,686</td><td class="n">1,436</td><td class="n">18,358</td><td class="n">25,480</td><td class="n">17,617</td></tr>
+    <tr><td>opinion 獨立評論</td><td class="n">2,978</td><td class="n">798</td><td class="n">8,791</td><td class="n">12,567</td><td class="n">6,503</td></tr>
+    <tr><td>futurecity 未來城市</td><td class="n">3,707</td><td class="n">1,157</td><td class="n">7,211</td><td class="n">12,074</td><td class="n">7,601</td></tr>
+    <tr><td>csr CSR@天下 <span class="dim">含 esgaward／lessonplan／trips／river 子站</span></td><td class="n">3,241</td><td class="n">2,633</td><td class="n">5,218</td><td class="n">11,092</td><td class="n">7,227</td></tr>
+    <tr><td>english 英文網</td><td class="n">1,436</td><td class="n">838</td><td class="n">3,023</td><td class="n">5,297</td><td class="n">2,979</td></tr>
+    <tr><td>event 活動站</td><td class="n">502</td><td class="n">40</td><td class="n">2,661</td><td class="n">3,203</td><td class="n">2,887</td></tr>
+    <tr><td>books 天下讀者俱樂部</td><td class="n">883</td><td class="n">718</td><td class="n">902</td><td class="n">2,503</td><td class="n">2,265</td></tr>
+    <tr><td>mkt 行銷站</td><td class="n">171</td><td class="n">80</td><td class="n">1,331</td><td class="n">1,581</td><td class="n">2,041</td></tr>
+    <tr><td>web.cw.com.tw <span class="dim">舊版/轉址服務；官網深入報告將其併入家族，本表拆列</span></td><td class="n">304</td><td class="n">0</td><td class="n">682</td><td class="n">986</td><td class="n">495</td></tr>
+    <tr class="sum"><td>合計</td><td class="n">99,647</td><td class="n">10,294</td><td class="n">254,764</td><td class="n c-acc">364,705</td><td class="n">315,075</td></tr>
+  </table></div>
+
+  <div class="insight"><b>兩個值得注意的排名：</b>①<b>換日線是站群第二貴的產品</b>（不含官網），主因是它的回源（非快取）請求佔 zone 9.48%——僅次於官網，DB 與 Logging 份額都被放大，快取策略同樣有優化空間。②<b>smiletaiwan 的 CF 份額 18,358 中有近半來自縮圖機歸戶</b>（它佔縮圖機流量 20.3%，站群第二大用戶）——圖多的內容站，縮圖機歸戶前的數字會嚴重低估。</div>
+
+  <h2><span class="no">2</span>GCP 正式環境各費用桶明細（NT$/月，含稅）</h2>
+  <div class="tablewrap"><table>
+    <tr><th>產品</th><th class="n">Compute</th><th class="n">Networking</th><th class="n">Cloud SQL</th><th class="n">Logging</th><th class="n">GKE費</th><th class="n">GCS</th><th class="n">其他</th></tr>
+    <tr><td>www</td><td class="n">10,128</td><td class="n">30,926</td><td class="n">15,569</td><td class="n">9,810</td><td class="n">2,519</td><td class="n">4,172</td><td class="n">673</td></tr>
+    <tr><td>crossing</td><td class="n">1,340</td><td class="n">1,760</td><td class="n">2,135</td><td class="n">1,345</td><td class="n">185</td><td class="n">85</td><td class="n">92</td></tr>
+    <tr><td>smiletaiwan</td><td class="n">1,441</td><td class="n">1,590</td><td class="n">1,311</td><td class="n">826</td><td class="n">261</td><td class="n">200</td><td class="n">57</td></tr>
+    <tr><td>opinion</td><td class="n">791</td><td class="n">626</td><td class="n">820</td><td class="n">517</td><td class="n">144</td><td class="n">44</td><td class="n">35</td></tr>
+    <tr><td>futurecity</td><td class="n">1,271</td><td class="n">493</td><td class="n">990</td><td class="n">624</td><td class="n">233</td><td class="n">53</td><td class="n">43</td></tr>
+    <tr><td>csr</td><td class="n">1,718</td><td class="n">460</td><td class="n">399</td><td class="n">251</td><td class="n">384</td><td class="n">11</td><td class="n">17</td></tr>
+    <tr><td>english</td><td class="n">436</td><td class="n">292</td><td class="n">361</td><td class="n">227</td><td class="n">104</td><td class="n">0</td><td class="n">16</td></tr>
+    <tr><td>event</td><td class="n">78</td><td class="n">265</td><td class="n">88</td><td class="n">56</td><td class="n">11</td><td class="n">0</td><td class="n">4</td></tr>
+    <tr><td>books</td><td class="n">522</td><td class="n">90</td><td class="n">80</td><td class="n">50</td><td class="n">129</td><td class="n">8</td><td class="n">3</td></tr>
+    <tr><td>mkt</td><td class="n">30</td><td class="n">84</td><td class="n">31</td><td class="n">20</td><td class="n">4</td><td class="n">0</td><td class="n">1</td></tr>
+    <tr><td>web</td><td class="n">135</td><td class="n">49</td><td class="n">57</td><td class="n">36</td><td class="n">24</td><td class="n">0</td><td class="n">2</td></tr>
+  </table></div>
+
+  <h2><span class="no">3</span>分攤鍵實測值</h2>
+  <p class="h2note">web／cms／dev ＝ 各 cluster user CPU requests 佔比（web 欄已含縮圖機 800m 依 Referer 歸戶）；回源請求 ＝ Cloud SQL／Logging 的分攤鍵；縮圖機 ＝ 該站佔縮圖機流量的 Referer 實測比例。</p>
+  <div class="tablewrap"><table>
+    <tr><th>產品</th><th class="n">web cluster</th><th class="n">cms cluster</th><th class="n">dev cluster</th><th class="n">回源請求</th><th class="n">縮圖機歸戶</th></tr>
+    <tr><td>www <span class="dim">另含 official cluster＋專屬 redis 100%</span></td><td class="n">5.54%</td><td class="n">8.10%</td><td class="n">7.17%</td><td class="n">69.15%</td><td class="n">51.43%</td></tr>
+    <tr><td>crossing</td><td class="n">5.94%</td><td class="n">2.39%</td><td class="n">3.18%</td><td class="n">9.48%</td><td class="n">13.92%</td></tr>
+    <tr><td>smiletaiwan</td><td class="n">8.46%</td><td class="n">3.31%</td><td class="n">5.73%</td><td class="n">5.82%</td><td class="n">20.30%</td></tr>
+    <tr><td>opinion</td><td class="n">4.10%</td><td class="n">2.39%</td><td class="n">3.18%</td><td class="n">3.64%</td><td class="n">6.09%</td></tr>
+    <tr><td>futurecity</td><td class="n">8.13%</td><td class="n">2.39%</td><td class="n">4.62%</td><td class="n">4.40%</td><td class="n">0%</td></tr>
+    <tr><td>csr</td><td class="n">12.54%</td><td class="n">4.79%</td><td class="n">10.51%</td><td class="n">1.77%</td><td class="n">3.68%</td></tr>
+    <tr><td>english</td><td class="n">1.58%</td><td class="n">3.13%</td><td class="n">3.34%</td><td class="n">1.60%</td><td class="n">2.18%</td></tr>
+    <tr><td>event</td><td class="n">0.50%</td><td class="n">—</td><td class="n">0.16%</td><td class="n">0.39%</td><td class="n">≈0%</td></tr>
+    <tr><td>books</td><td class="n">3.44%</td><td class="n">2.39%</td><td class="n">2.87%</td><td class="n">0.35%</td><td class="n">1.64%</td></tr>
+    <tr><td>mkt</td><td class="n">0.20%</td><td class="n">—</td><td class="n">0.32%</td><td class="n">0.14%</td><td class="n">0%</td></tr>
+    <tr><td>web</td><td class="n">1.11%</td><td class="n">—</td><td class="n">—</td><td class="n">0.26%</td><td class="n">≈0%</td></tr>
+  </table></div>
+
+  <div class="callout"><b>CF 口徑敏感度提醒：</b>請求 vs bytes 兩口徑對各站影響差異大——crossing／opinion／csr 用 bytes 口徑會少五到七成（動態請求多、單請求 bytes 小），event／mkt 反而略增（圖大流量重）。財務定案口徑前，跨產品比較請固定用同一欄。</div>
+
+  <h2><span class="no">4</span>口徑與假設</h2>
+  <ol class="assump">
+    <li><b>互斥可加總</b>：本表 www 不含 web.cw.com.tw（拆列），故 www 比其深入報告的 258,390 低約 1,000。三個產品有深入報告：<a href="https://claude.ai/code/artifact/3e6cd57a-62da-4425-b2d1-ddf671ade618">天下官網</a>、<a href="https://claude.ai/code/artifact/85ddc792-2aac-47c3-a354-d3a45f7e202a">csr × futurecity</a>、<a href="https://claude.ai/code/artifact/0b2388c9-4aea-4d6e-9ee0-b13064bdd538">併站情境評估</a>。</li>
+    <li><b>未涵蓋的 14.8%</b>（cw-web-prod 正式費用）：api-cw-com-tw（11 站共用 API）、api-app（天下 App 後端）、feature／topic／techtaiwan／ad／project／cw-hub／curation／ai-hub 等未列產品，與無法歸戶的殘餘流量。共用 API 若要攤回各站需另做呼叫來源分析。</li>
+    <li><b>方法沿用三站報告定版</b>：2026-07 iKala 帳單（匯率 32.58、含稅 ×1.05）＋ CF GraphQL 全月流量＋ kubectl requests 快照（2026-08-20）。分攤鍵、共用 VM 處理、縮圖機 Referer 歸戶（無 Referer 的 9.8% 按可歸戶比例攤）均同。</li>
+    <li><b>各站 CMS（*.cwg.tw）灰雲直連</b>：零 CF 份額；CMS 運算含在 cms cluster 欄。event／mkt／web 無獨立 CMS。opinion 與 crossing 的 dev 佔比含各自 dev CMS。</li>
+    <li><b>event／mkt 幾乎是純流量成本</b>：兩者 workload 極小（50m／20m CPU），費用主體是 CF 與網路——若未來下線或搬遷，GCP 側省不了什麼。</li>
+    <li><b>已知低估點</b>：official cluster 尖峰 autoscale 至 2 台使 www 的 Compute 略被低估（v2 精算點）；bot 流量未剔除。</li>
+  </ol>
+
+  <div class="foot">
+    資料來源：iKala 2026-07 GCP 帳單（天下雜誌法人）· Cloudflare GraphQL Analytics（2026-07 全月）· kubectl resource requests 快照（2026-08-20）<br>
+    產出：2026-08-21 · cwgroup 系統組 Peter Lin · 唯讀估算作業，未動任何正式環境
+  </div>
+</div>
+</body>
+</html>

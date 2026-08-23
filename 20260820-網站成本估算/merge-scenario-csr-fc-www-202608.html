@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>併站情境評估</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F8F7F4; --card:#FFFFFF; --ink:#26221B; --muted:#6D6558;
+  --line:#E2DDD2; --line-soft:#ECE8DF;
+  --acc:#9A6A00; --acc-soft:#F7EFDC;
+  --good:#2E7D4F; --good-soft:#EAF4EE;
+  --warn-bg:#FBF0E0; --warn-ink:#8A5A10;
+  --chip-bg:#F0EDE4;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#171512; --card:#201D18; --ink:#EAE6DD; --muted:#A69D8C;
+    --line:#3B362C; --line-soft:#2B2822;
+    --acc:#D9A84E; --acc-soft:#2E2716;
+    --good:#5CB585; --good-soft:#1E2E25;
+    --warn-bg:#2E2614; --warn-ink:#D9B564;
+    --chip-bg:#2A2720;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#171512; --card:#201D18; --ink:#EAE6DD; --muted:#A69D8C;
+  --line:#3B362C; --line-soft:#2B2822;
+  --acc:#D9A84E; --acc-soft:#2E2716;
+  --good:#5CB585; --good-soft:#1E2E25;
+  --warn-bg:#2E2614; --warn-ink:#D9B564;
+  --chip-bg:#2A2720;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  font-size:15px; line-height:1.75;
+}
+.wrap{max-width:920px; margin:0 auto; padding:48px 28px 80px}
+.mono{font-family:"IBM Plex Mono","Noto Sans TC",monospace}
+.eyebrow{
+  font-size:12px; letter-spacing:.14em; color:var(--muted);
+  text-transform:uppercase; font-weight:500; margin-bottom:10px;
+  font-family:"IBM Plex Mono",monospace;
+}
+h1{font-size:30px; font-weight:900; margin:0 0 6px; line-height:1.3; text-wrap:balance}
+.sub{color:var(--muted); margin:0 0 36px; max-width:64ch}
+h2{font-size:19px; font-weight:700; margin:52px 0 6px; text-wrap:balance}
+h2 .no{color:var(--muted); font-weight:500; font-family:"IBM Plex Mono",monospace; font-size:15px; margin-right:8px}
+.h2note{color:var(--muted); font-size:13.5px; margin:0 0 16px}
+p{margin:10px 0; max-width:70ch}
+
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:26px 0 8px}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  padding:20px 22px; border-top:3px solid var(--acc);
+}
+.card .site{font-weight:700; font-size:15px; margin-bottom:2px; color:var(--acc)}
+.card .host{font-size:12px; color:var(--muted); font-family:"IBM Plex Mono",monospace}
+.card .amt{font-size:29px; font-weight:900; margin:12px 0 0; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
+.card .amt small{font-size:14px; font-weight:500; color:var(--muted)}
+.card .split{font-size:13px; color:var(--muted); margin-top:6px; font-variant-numeric:tabular-nums}
+
+.tablewrap{overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:10px; margin:14px 0}
+table{border-collapse:collapse; width:100%; min-width:560px; font-size:14px}
+th{
+  text-align:left; font-size:12px; letter-spacing:.06em; color:var(--muted); font-weight:500;
+  padding:12px 16px 8px; border-bottom:1px solid var(--line); white-space:nowrap;
+}
+td{padding:9px 16px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+tr.sum td{border-top:1.5px solid var(--line); font-weight:700; background:var(--chip-bg)}
+td .dim{color:var(--muted); font-size:12.5px}
+.c-acc{color:var(--acc); font-weight:600}
+.c-good{color:var(--good); font-weight:600}
+
+.chip{
+  display:inline-block; font-size:12px; padding:1px 9px; border-radius:99px;
+  background:var(--chip-bg); color:var(--muted); font-family:"IBM Plex Mono",monospace;
+  white-space:nowrap;
+}
+.callout{
+  background:var(--warn-bg); color:var(--warn-ink); border-radius:10px;
+  padding:14px 18px; font-size:14px; margin:18px 0; max-width:none;
+}
+.callout b{font-weight:700}
+ol.assump{padding-left:22px; margin:12px 0}
+ol.assump li{margin:9px 0; max-width:75ch}
+ol.assump li b{font-weight:700}
+.foot{
+  margin-top:56px; padding-top:18px; border-top:1px solid var(--line);
+  color:var(--muted); font-size:12.5px; font-family:"IBM Plex Mono",monospace;
+}
+.insight{
+  border-left:3px solid var(--acc); background:var(--acc-soft);
+  padding:12px 18px; border-radius:0 8px 8px 0; margin:18px 0; font-size:14px; max-width:none;
+}
+.insight.good{border-left-color:var(--good); background:var(--good-soft)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">cwgroup infra · 情境模擬（非既定計畫） · 基於 2026-07 成本分攤定版</div>
+  <h1>csr ＋ futurecity 併入官網的費用情境評估</h1>
+  <p class="sub">情境：兩站轉為 www.cw.com.tw 底下的頻道（如 /csr、/futurecity），取消獨立子網域，<b>流量不變</b>。本評估回答一個問題：集團實付的 GCP ＋ Cloudflare 總費用會變多少？結論先講：<b>幾乎不變（−1.1% ～ +0.2%）</b>，變的主要是帳掛在誰名下。</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="site">集團實付變化</div>
+      <div class="host">現況三站合計 281,545/月</div>
+      <div class="amt">−3,000 ～ +500<small> /月</small></div>
+      <div class="split">理想情況省 1.1%；不動 node pool 則微增</div>
+    </div>
+    <div class="card">
+      <div class="site">帳務搬移</div>
+      <div class="host">分攤歸屬變更，非真實增減</div>
+      <div class="amt">23,155<small> /月 → 官網</small></div>
+      <div class="split">csr＋futurecity 份額歸零，官網 ≈ 278,600–282,000</div>
+    </div>
+    <div class="card">
+      <div class="site">可實現淨省（上限）</div>
+      <div class="host">需人工縮 web pool 1 台節點</div>
+      <div class="amt">≈ 2,500–3,000<small> /月</small></div>
+      <div class="split">e2-standard-4 −3,300 ＋ official 尖峰微增</div>
+    </div>
+  </div>
+
+  <h2><span class="no">1</span>費用結構拆解：68% 跟流量走、32% 跟工作負載走</h2>
+  <p class="h2note">兩站月費 23,155 依成本驅動因素拆成兩類——前提「流量不變」，第一類原封不動搬到官網帳上；只有第二類理論上可省。</p>
+  <div class="tablewrap"><table>
+    <tr><th>費用項</th><th class="n">現況（兩站合計 NT$/月）</th><th>併站後去向</th><th class="n">集團實付變化</th></tr>
+    <tr><td>Cloudflare 份額 <span class="dim">50 萬為全集團固定合約；zone 數、請求數均不變</span></td><td class="n">12,429</td><td>改計入官網份額</td><td class="n">0</td></tr>
+    <tr><td>Networking／Cloud SQL／Logging／GCS／其他 <span class="dim">同樣的頁面、回源、DB 查詢，只是換 host</span></td><td class="n">3,341</td><td>跟著流量移至官網</td><td class="n">0</td></tr>
+    <tr class="sum"><td>跟流量走 小計</td><td class="n">15,770（68%）</td><td>搬家，不消失</td><td class="n">0</td></tr>
+    <tr><td>Compute（兩站專屬 pod 底座）<span class="dim">prod 19 pod ＋ CMS 6 pod，約 2 核 requests 保留</span></td><td class="n">2,980</td><td>pod 下架；<b>需人工縮 web pool 才變現</b></td><td class="n c-good">−3,300（縮 1 台 e2-standard-4）</td></tr>
+    <tr><td>GKE 管理費份額 <span class="dim">每 cluster 固定價，cluster 數不變</span></td><td class="n">614</td><td>改計入其他站份額</td><td class="n">0</td></tr>
+    <tr><td>測試環境 <span class="dim">dev＋uat 27 pod，僅 0.5 核 requests，縮不了 dev 節點</span></td><td class="n">3,791</td><td>帳面移轉；節點數不變</td><td class="n">0</td></tr>
+    <tr><td>official cluster 承接流量 <span class="dim">+9.1% 動態請求，autoscaler 尖峰節點時數微增</span></td><td class="n">—</td><td>新增負載</td><td class="n">+200 ～ +500</td></tr>
+    <tr class="sum"><td>合計</td><td class="n">23,155</td><td></td><td class="n c-acc">−3,000 ～ +500</td></tr>
+  </table></div>
+
+  <h2><span class="no">2</span>「算力跟著流量搬家」——實測驗證</h2>
+  <p class="h2note">pod 處理流量會消耗算力，把流量倒進官網，official cluster 的消耗會漲。實測（2026-08-20 晚間尖峰 kubectl top 快照）確認了方向，也量出了尺度。</p>
+  <div class="tablewrap"><table>
+    <tr><th>觀測項</th><th class="n">數值</th><th>解讀</th></tr>
+    <tr><td>csr＋fc 全部 pod 實際 CPU 用量</td><td class="n">128m（0.13 核）</td><td>其 2,030m requests 是 <b>16 倍</b>於實際用量的可用性底座（每 deployment 維持 2–3 副本，幾乎閒置）</td></tr>
+    <tr><td>兩站動態請求相對官網</td><td class="n">20.5M vs 224.6M（+9.1%）</td><td>官網 app 承接後平均多 100–250m 實際負載</td></tr>
+    <tr><td>official cluster 尖峰行為</td><td class="n">1 → 2 台 e2-highcpu-8</td><td>白天 1 台、晚間尖峰 autoscaler 開第 2 台、www pod 由 5 HPA 至 6——多的負載會反映在<b>尖峰節點時數</b>上</td></tr>
+    <tr><td>web cluster 節點使用率</td><td class="n">23–32%</td><td>瓶頸在 requests 保留（排程密度），不在算力；縮節點的依據是釋出 2,030m 保留</td></tr>
+  </table></div>
+  <div class="insight"><b>正確的圖像：</b>web cluster 釋出的是「2 核保留」不是「2 核算力」；真實算力（~0.13 核）搬到 official cluster 後，大多時間被既有 headroom 吸收，效果是尖峰第二台節點早一點開、晚一點關。<b>若 web pool 沒有人工縮池，這個併站在 infra 帳上是純搬家、一毛不省還微增。</b></div>
+
+  <h2><span class="no">3</span>風險與一次性成本</h2>
+  <ol class="assump">
+    <li><b>快取劣化風險</b>：三站現況命中率（請求口徑）——csr 51%、www 44%、futurecity 21%。csr 頁面併入 www 的 app 後若沿用 www 的 cache 行為，csr 那部分回源流量會增加，CF 與 GCP Networking 同步微漲；futurecity 本來就低，無感。方向是漲不是跌，量級小但存在。</li>
+    <li><b>一次性搬遷工程不在月費內</b>：CMS 內容遷移（csr-cms／csr-river-cms／futurecity-cms 三套併入 cw-cms）、全站 301 redirect、SEO 權重轉移與重收錄——工程與流量風險成本遠高於 infra 月省額。</li>
+    <li><b>假設</b>：流量不變；www app 服務這些頁面的每請求算力效率不輸原 app；帳單口徑同三站報告（2026-07、匯率 32.58、含稅）。</li>
+  </ol>
+
+  <h2><span class="no">4</span>決策視角</h2>
+  <div class="insight good"><b>如果動機是省 infra 費用，這個改動不值得</b>——理想情況省 1.1%，還要付一次性搬遷工程。它真正的效益在營運面：少維護兩套站、三套 CMS、27 個測試環境 workload（合計 30+ deployment）。反過來，同樣的工程力氣投在 <b>www 動態頁快取優化</b>上，槓桿完全不同量級：官網 CF＋Networking 年費約 256 萬，而 www 命中率只有 44%——每拉高 10 個百分點都是以萬計的月省額。</div>
+
+  <h2><span class="no">5</span>附註：本評估發現的報告精算點</h2>
+  <ol class="assump">
+    <li><b>official cluster 權重低估</b>：官網成本報告的 Compute 拆分以「official＝1 台 e2-highcpu-8」計權重，本次實測發現該 pool 尖峰會 autoscale 到 2 台——www 的 Compute 份額被低估，量級每月數百至低千元（取決於第二台的月均開機時數）。若官網報告要正式交付，建議以 7 月節點時數實際值修正（billing 明細或 Cloud Monitoring）。此點不影響本情境評估的結論。</li>
+  </ol>
+
+  <div class="foot">
+    基礎數據：三站成本分攤定版（csr 11,084／futurecity 12,071／www 258,390，2026-07 資料，含縮圖機 Referer 歸屬）· kubectl top 快照 2026-08-20 晚間尖峰<br>
+    產出：2026-08-21 · 情境模擬文件，非變更計畫；如決定執行，依規範另開 itproject 需求單與變更四件事 · cwgroup 系統組 Peter Lin
+  </div>
+</div>
+</body>
+</html>
