@@ -103,7 +103,7 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
   <div class="eyebrow">競品分析 · 2026-10-02</div>
   <h1>中央社 MCP 與日經 NIKKEI KAI MCP：服務、評價與天下是否跟進</h1>
   <p class="lede">2026 年 8 月 31 日，中央社推出「中央社 MCP」；隔天 9 月 1 日，日本經濟新聞推出「NIKKEI KAI MCP」。兩者都讓 ChatGPT、Claude 等 AI 工具直接查自家新聞資料庫並附上出處，但賣法完全不同：中央社目前只對個人開賣、月費 200 元；日經只賣企業與團體、年約報價。這份報告分別整理兩個服務怎麼運作、外界怎麼評、媒體自己怎麼說，再比較兩者，最後評估天下雜誌是否值得效仿。</p>
-  <p class="meta">兩個服務都上線約 1 個月 · 第 2 版（2026-10-02）：已逐條核對原文 · 資料來源與核對紀錄見文末</p>
+  <p class="meta">兩個服務都上線約 1 個月 · 第 3 版（2026-10-02）：已逐條核對原文，並參考另一份 AI 報告補充 · 資料來源與核對紀錄見文末</p>
 
   <div class="verdict">
     <span class="tag">結論</span>
@@ -167,6 +167,15 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li><strong>搜尋方式</strong>：中央社的開發者說明，他們刻意不用目前流行的語意向量搜尋，而是讓 AI 下關鍵字，用中央社原有的 Elasticsearch 搜尋，再用重新排序模型補足語意。這也解釋了 Cofacts 遇到的「一字之差就查不到」問題。</li>
     <li><strong>工具說明是寫給 AI 看的</strong>：查無結果時還會回傳「重試步驟」（先拿掉日期、再減少關鍵字、再查譯名）。</li>
     <li><strong>已知問題</strong>：9 月 2 日官網公告，部分使用者在 ChatGPT 呼叫時出現 403 錯誤，目前有暫時解法，根本原因仍在排查。</li>
+    <li><strong>串接教學</strong>：官網常見問題說，目前提供 ChatGPT、Claude、Grok、Claude Code 與自建 Agent 的圖文教學。</li>
+  </ul>
+
+  <h3>服務條款重點</h3>
+  <ul>
+    <li>不得將取得的內容「未經授權之大量重製、轉售、散布或再授權」；著作權屬中央社或原權利人。</li>
+    <li>以點數計費，用過的點數不退費；系統錯誤造成的誤扣會返還。</li>
+    <li>屬於「一經提供即完成的線上服務」，不適用七日鑑賞期，購買時要勾選同意。</li>
+    <li>內容「僅供參考」，不保證即時、完整或無誤。</li>
   </ul>
 
   <h3>演進過程</h3>
@@ -239,13 +248,14 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li>一般問答（每題查 1–2 次）：每月約可問 175–350 題，很划算。</li>
     <li>讓 AI 代理自己跑大型任務（例如逐年統計）：一次可能用掉 60–120 點，一個月只夠做 5–10 次。</li>
   </ul>
+  <p>作者另外列出三個開發上的問題：用標準 Python 程式連線會被防火牆擋下、回傳 403，要偽裝成瀏覽器才能連；API 回應裡沒有扣點資訊，要登入後台才看得到用量；沒有單日用量上限或警示，AI 代理失控時可能「一覺醒來點數歸零」。這份實測發表一週後（9/15），中央社推出加購點數，兩者是否有關無法確認。</p>
   <p>作者的標題是〈拒絕黑盒〉，反映出<strong>點數計費不透明會讓使用者不安</strong>。另外，官網寫的換算是「1 點約等於 1 次 API 呼叫」，與這位開發者實測的「每次 2 點」不一致，可能是不同工具扣點不同，官網沒有說明。這是天下若要做時最該先想清楚的地方。</p>
   <p class="note">這份開發者報告中對資料總量的估算（850 萬至 1,000 萬篇）與中央社官網數字（478 萬+ 則）不一致，資料量請以官方數字為準；點數計算部分則有實際截圖與紀錄佐證。</p>
 </section>
 
 <section id="cna-view">
   <h2>4. 中央社自己怎麼看</h2>
-  <p>從社長胡婉玲在發布會的致詞、主導專案的中央社資訊暨創新中心主任（媒體實驗室主任）宋育泰接受《數位時代》的專訪，可以歸納出五個動機：</p>
+  <p>從社長胡婉玲（董事長為江春男）在發布會的致詞、主導專案的中央社資訊暨創新中心主任（媒體實驗室主任）宋育泰接受《數位時代》的專訪，可以歸納出五個動機：</p>
   <ol>
     <li><strong>商業模式的第三次轉型。</strong>胡婉玲說，中央社成立 102 年，最早是 B2B，供稿給海內外媒體；1990 年代網路興起後改做 B2C；現在進入 AI 時代，「許多人都是直接透過 AI 在搜尋資訊，面對『零點擊』衝擊」，所以要透過 MCP 提供資料。</li>
     <li><strong>「網站的末日要來了」。</strong>宋育泰引用 Pew 研究：Google 搜尋頁出現 AI 摘要時，使用者點擊搜尋結果的比例只剩 8%，點 AI 摘要引用來源的只有 1%。他說：「我是一個經營網站出身的人，但現在在做一件把網站都砍掉的事情。」媒體的資訊流從「媒體到人」變成「媒體經過 AI 到人」，下一戰是「誰能被 AI 找到」。</li>
@@ -253,6 +263,7 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li><strong>強制標註出處、減少幻覺。</strong>「我們不希望你拿的東西有幻覺。」中央社內部準備了 500 道有標準答案的新聞題目，讓不同 AI 與搜尋方式作答、逐題比對，用來改善檢索。宋育泰認為價值在三件事：資料從哪裡來、能不能追溯、有沒有足夠深的台灣資料。</li>
     <li><strong>可信度是本業。</strong>胡婉玲：「在什麼都可以變造的年代，我們依然可以提供最可信賴的新聞資訊。」宋育泰也說，中央社不會因為做 MCP 而改變第一線記者的工作方式。</li>
   </ol>
+  <p><strong>對 AI 爬蟲的立場：不給免費訓練，但提供付費檢索。</strong>中央社主站的 robots.txt 宣告「search=yes, ai-input=yes, ai-train=no」，也就是允許搜尋引擎與 AI 即時引用，但不允許拿去訓練模型，並封鎖 GPTBot（OpenAI）、ClaudeBot（Anthropic）、Google-Extended（Google 的 AI 訓練）等爬蟲。對照 MCP，可以推測中央社的路線是：不讓 AI 免費抓去訓練，而是透過付費 MCP，以「即時檢索、附出處」的方式讓 AI 使用。這和日經「擋免費、賣授權」的做法方向一致，只是中央社沒有提告。（此為依網站設定的推論，中央社主管未公開談過 AI 授權策略。）</p>
   <p>值得注意的是，中央社自己也坦承這是「超前部署」。宋育泰說，現在還沒走到所有人都透過 AI 上網的程度，MCP 會不會成為主流入口沒有人能保證，但與其等流量消失才行動，不如先把介面準備好。</p>
   <p>整體來看，中央社把它定位成「台灣第一家」「繁體中文媒體之先」，強調可信與公共價值；價格訂得很低（每月 200 元），看起來更重視普及與影響力，短期營收不是主要目標。這跟中央社是國家通訊社有關，天下的處境不同。</p>
 </section>
@@ -372,7 +383,7 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
       <tr><td>銷售通路</td><td>線上自助訂閱</td><td>業務團隊加 NTT Data 合作銷售</td></tr>
       <tr><td>主要目的</td><td>公共價值、台灣資訊可信度、因應零點擊</td><td>企業營收、擴大既有企業資料庫生意</td></tr>
       <tr><td>外界評價來源</td><td>Cofacts 與開發者的獨立實測、部落客評論</td><td>日經官網刊登的客戶專訪、設計獎</td></tr>
-      <tr><td>對其他 AI 的態度</td><td>主動把資料送進各家 AI</td><td>授權給企業使用，同時控告未經授權的 AI 業者</td></tr>
+      <tr><td>對其他 AI 的態度</td><td>禁止 AI 爬蟲拿去訓練，但透過付費 MCP 讓 AI 即時檢索</td><td>授權給企業使用，同時控告未經授權的 AI 業者</td></tr>
     </tbody>
   </table></div>
   <p>一句話總結：<strong>中央社把新聞變成「人人可用的可信來源」，日經把新聞變成「企業願意付高價的工作工具」</strong>。中央社的做法重視普及，日經的做法重視營收。兩者都證明了「附出處、有授權」是媒體在 AI 時代的核心賣點。</p>
@@ -387,12 +398,15 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
       <tr><td><strong>LSEG（路透）</strong></td><td>LSEG MCP</td><td>金融業</td><td>透過 MCP 提供財務數據與路透新聞，支援 Claude、ChatGPT、Copilot、Gemini 等，並做權限控管與資料來源追蹤。</td></tr>
       <tr><td><strong>Dow Jones／Factiva</strong></td><td>授權整合平台＋專有數據</td><td>企業</td><td>Factiva 在 2026 年 1 月宣布取得超過 8,000 個來源的生成式 AI 使用授權，再轉賣給企業做私有 AI；小型媒體可以加入，不必自己開發。Dow Jones 的看法是：新聞文章是吸引客戶的入口，真正值錢的是「真正專有」的資料，例如長年累積的投資與產業資料庫，所以它願意讓 AI 讀新聞。</td></tr>
       <tr><td><strong>The Economist</strong></td><td>ChatGPT App（2026-05）＋企業 API（2026-08）</td><td>讀者／企業</td><td>ChatGPT App 只開放付費牆外的圖表數據（美國民調）。給 AI 讀的內容只限付費牆外的頁面，新聞報導留在付費牆後，自稱態度是「鑑識般地謹慎」。2026 年 8 月開放 API，讓企業把內容接進自己的私有 LLM，總裁說這塊成長很快，且一旦進入企業的工作流程就很難被取代。</td></tr>
-      <tr><td><strong>TIME</strong></td><td>自建 AI 代理＋管理 AI 爬蟲＋賣 AI 曝光顧問</td><td>讀者／品牌</td><td>2023 年拿掉百年封存資料的付費牆；用封存資料做 AI 問答。2026-06 改成預設封鎖 AI 爬蟲，只放行約 70 個，並透過 TollBit 提供機器專用的精簡版本。2026-03 推出顧問服務，告訴品牌自己在 ChatGPT、Claude 等 AI 裡的樣貌；TIME 說自己每月被 AI 引用 3,000 萬到 5,000 萬次。態度是「要被 AI 用，就要最容易被用」。</td></tr>
-      <tr><td><strong>Financial Times</strong></td><td>AI 付費牆＋企業授權</td><td>讀者／企業</td><td>用 AI 判斷每位讀者的付費意願，決定顯示哪一種訂閱方案；Digiday 報導，看到這個 AI 付費牆的讀者群，轉換率提高 290%、終身價值提高 7%–10%（只涵蓋同意被追蹤的 30%–40% 讀者，FT 仍在用對照組確認真實效果）。FT 也已開放封存資料給企業的私有 LLM。另有訂戶用的 AI 問答 Ask FT。</td></tr>
+      <tr><td><strong>TIME</strong></td><td>自建 AI 代理＋管理 AI 爬蟲＋賣 AI 曝光顧問</td><td>讀者／品牌</td><td>2023 年拿掉百年封存資料的付費牆。2025 年 11 月與 Scale AI 推出 TIME AI Agent，用約 75 萬筆封存資料回答問題，可產生 5 分鐘語音摘要、把文章翻成 13 種語言，幾乎每篇文章頁都有入口。2026-06 改成預設封鎖 AI 爬蟲，只放行約 70 個，並透過 TollBit 提供機器專用的精簡版本。2026-03 推出顧問服務，告訴品牌自己在 ChatGPT、Claude 等 AI 裡的樣貌；TIME 說自己每月被 AI 引用 3,000 萬到 5,000 萬次。態度是「要被 AI 用，就要最容易被用」。</td></tr>
+      <tr><td><strong>Financial Times</strong></td><td>AI 付費牆＋企業授權</td><td>讀者／企業</td><td>用 AI 判斷每位讀者的付費意願，決定顯示哪一種訂閱方案；Digiday 報導，看到這個 AI 付費牆的讀者群，轉換率提高 290%、終身價值提高 7%–10%（只涵蓋同意被追蹤的 30%–40% 讀者，FT 仍在用對照組確認真實效果）。FT 也已開放封存資料給企業的私有 LLM。訂戶用的 AI 問答 Ask FT 已推廣到全部 FT Professional 訂戶（超過 150 萬讀者），但 FT 自己承認它「還不是讀者使用 FT 的主要方式」，離「不可或缺」還有距離。</td></tr>
       <tr><td><strong>平台分潤</strong></td><td>Microsoft PCM（2026-02）、Perplexity Comet Plus</td><td>平台</td><td>媒體不必自己做 MCP，而是授權給平台，依 AI 使用量分錢。微軟的合作夥伴包含 AP、Condé Nast、Hearst、People、USA TODAY、Business Insider，Yahoo 是第一個買方。Perplexity 據報導把 Comet Plus 訂閱收入的 80% 分給媒體（此項未能核對原文）。</td></tr>
+      <tr><td><strong>MT Newswires</strong></td><td>Claude 金融服務連接器</td><td>金融業</td><td>財經新聞通訊社，與 LSEG 等一起成為 Anthropic「Claude for Financial Services」的連接器，讓 Claude 直接取得全球金融市場新聞。</td></tr>
+      <tr><td><strong>技術中介服務</strong></td><td>Cloudflare AI Index、TollBit、Microsoft NLWeb、RSL</td><td>媒體</td><td>讓媒體不必自己寫程式就有 MCP 端點：Cloudflare 2025 年 9 月宣布 AI Index，可自動替網站建立搜尋索引、MCP 伺服器與 llms.txt，並可搭配「按爬取付費」；TollBit 替媒體代管 MCP 等 AI 存取端點並收費（TIME 就是它的客戶）；Microsoft NLWeb 的每個網站實例本身就是 MCP 伺服器，Hearst 等已採用；RSL 則是讓網站宣告 AI 使用條件與收費方式的授權標準。</td></tr>
     </tbody>
   </table></div>
   <p class="note">網路上也有「Guardian MCP」「Reuters MCP」等工具，但多半是第三方用公開 API 或爬蟲自己做的，不是媒體官方產品。</p>
+  <p>從這些案例可以看出，<strong>自建付費 MCP 的多半是本來就有企業資料庫授權生意的媒體</strong>（日經、Dow Jones、LSEG、MT Newswires），MCP 只是換一個交付方式。技術門檻也正在消失，媒體真正要決定的是：給摘要還是全文、按次還是包月、給誰用。</p>
   <p>歸納起來：<strong>B2B 是目前主要收入來源</strong>（日經、LSEG、Factiva、The Economist 與 FT 的企業授權）；對讀者的 AI 功能多半是為了提高訂閱或留住訂戶（FT、TIME）；中央社是少數直接對個人賣 MCP 的媒體。</p>
   <p>Nieman Lab 轉載的一篇分析把 TIME、The Economist、Dow Jones 的做法整理成一個問題：<strong>「讀者真正付錢買的是什麼？機器讀了你的內容，會讓它變得更值錢還是更不值錢？」</strong>TIME 賣的是觸及率，所以全面開放；The Economist 賣的是判斷力，所以守住報導、只開放其他部分；Dow Jones 賣的是專有資料，所以可以讓 AI 讀新聞。三種做法可以混搭。這個問題也正是天下該先回答的。</p>
 </section>
@@ -418,7 +432,8 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li><strong>零點擊是真的。</strong>讀者愈來愈常直接問 AI，天下若不在 AI 的答案裡，等於被忽略。做 MCP 可以確保 AI 引用天下時附上正確連結。</li>
     <li><strong>台灣只有中央社做了。</strong>現在進場還算早，天下可以成為「財經與產業領域的可信來源」。</li>
     <li><strong>獨家數據有 B2B 價值。</strong>日經上線一年就有超過 100 家企業導入，說明「新聞＋企業資料」可以賣給企業的研究、策略、業務、公關部門。</li>
-    <li><strong>技術門檻不高。</strong>中央社的工具設計已經公開可參考，難的是資料整理，不是寫程式。</li>
+    <li><strong>技術門檻不高。</strong>中央社約半年、用 AI 輔助就開發完成，工具設計也已公開可參考；Cloudflare、TollBit 等中介服務甚至可以代建 MCP 端點。難的是資料整理與授權條款，不是寫程式。</li>
+    <li><strong>多一個 AI 授權談判籌碼。</strong>有了可計量、可控管的 AI 存取管道，未來和 AI 平台談授權時比較有依據。</li>
   </ul>
 
   <h3>要避開的坑（從中央社學到的）</h3>
@@ -443,20 +458,44 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li><strong>價格要撐得起價值。</strong>能美防災的高層曾嫌貴，最後是靠試用期讓多個部門實際用過才買單。企業方案一定要有試用期，並準備具體的省時數字。</li>
   </ul>
 
-  <h3>建議的做法：分三階段</h3>
+  <h3>建議的做法：先實測，再分三階段</h3>
+  <div class="phase">
+    <div class="when">第 0 步<br>2 週內</div>
+    <div><h4>先親自試用中央社 MCP</h4><p>花 200 元訂閱中央社 MCP，用 20 道天下讀者常問的題目，比較 ChatGPT／Claude 接與不接 MCP 的回答品質，並記錄點數消耗。成本很低，能直接確認「接上新聞資料庫」對使用者的價值有多明顯。同時可詢問中央社 Team 方案的內容與價格，作為天下企業方案定價參考。</p></div>
+  </div>
   <div class="phase">
     <div class="when">第 1 階段<br>約 3 個月</div>
     <div><h4>內部版：先給編輯部與業務部用</h4><p>學中央社先做「志明編輯助手」再對外。把文章資料庫整理好（作者、日期、分類、授權、是否業配），做一個內部 MCP，讓記者查舊文、業務查企業報導。風險最低，也能驗證資料品質。可評估申請 Google 新聞相關補助。</p></div>
   </div>
   <div class="phase">
     <div class="when">第 2 階段<br>約 6 個月</div>
-    <div><h4>訂戶加值：MCP 存取放進數位訂閱</h4><p>不另外賣 200 元方案，而是把「在 ChatGPT／Claude 中查天下全文」當作高階訂閱的功能，目標是提高訂閱轉換與續訂率。可參考 FT 用 AI 提高轉換率的做法，但要用對照組確認真實效果。非訂戶只能拿到標題、摘要與連結，引導回天下網站。</p></div>
+    <div><h4>訂戶加值：MCP 存取放進數位訂閱</h4><p>不另外賣 200 元方案，而是把「在 ChatGPT／Claude 中查天下全文」當作高階訂閱的功能，目標是提高訂閱轉換與續訂率。可參考 FT 用 AI 提高轉換率的做法，但要用對照組確認真實效果。非訂戶只能拿到標題、摘要與連結，引導回天下網站。建議先做小規模試作：選 3 到 5 年、特定主題（如半導體、ESG）的文章，回傳「摘要＋重點＋出處連結」而不是全文，邀 50 到 100 位全閱讀訂戶試用，並事先訂好停止條件。若天下已有 AI 摘要流程，產出可直接當成 MCP 的回傳內容。</p></div>
   </div>
   <div class="phase">
     <div class="when">第 3 階段<br>1 年內</div>
     <div><h4>企業方案：獨家調查數據</h4><p>把 2000 大企業、標竿企業聲望等歷年調查做成可查詢的數據工具，賣給企業、法人、學校、研究機構。比照日經：依人數與用途報價、簽年約、提供試用，並同時提供網頁版與 MCP 兩種用法。這是最可能帶來實質營收的部分。</p></div>
   </div>
-  <p>同時進行：評估加入 Microsoft PCM、Perplexity 等平台的分潤授權，並檢查目前網站對 AI 爬蟲的政策（參考 TIME 的白名單做法）。</p>
+  <p>同時進行（可立即開始）：訂定天下的 AI 內容授權原則，例如參考中央社在 robots.txt 宣告「可供 AI 即時引用、不可拿去訓練」；檢查網站目前的 CDN 與 AI 爬蟲設定（參考 TIME 的白名單做法），評估 Cloudflare AI Index、TollBit 等中介方案；並評估加入 Microsoft PCM 等平台的分潤授權。</p>
+
+  <h3>主要風險與對策</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>風險</th><th>說明</th><th>對策</th></tr></thead>
+    <tbody>
+      <tr><td>侵蝕訂閱</td><td>MCP 若回傳全文又便宜，讀者可能不再訂閱</td><td>只回傳摘要與出處連結，全文回天下網站或 App 閱讀；MCP 只給訂戶</td></tr>
+      <tr><td>需求不明</td><td>中央社上線一個月，仍沒有公開的使用人數或企業客戶</td><td>先做小規模試作，事先訂好停止條件</td></tr>
+      <tr><td>計價爭議</td><td>中央社被批評扣點不透明、點數燒太快</td><td>公開每種工具的扣點表，提供用量儀表板與單日上限</td></tr>
+      <tr><td>內容權利</td><td>外稿、合作、翻譯內容不一定能給 AI 使用</td><td>上線前盤點可開放的內容範圍</td></tr>
+      <tr><td>維運與相容性</td><td>各家 AI 工具更新頻繁，例如中央社遇到 ChatGPT 403 問題</td><td>優先支援 OAuth 標準連線，或交給中介服務代管</td></tr>
+      <tr><td>準確度與品牌</td><td>AI 誤用天下內容，錯誤答案卻掛天下出處</td><td>建立評測題庫（參考中央社 500 題），定期抽測</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>建議追蹤的指標</h3>
+  <ul>
+    <li><strong>使用</strong>：連線的訂戶數、每週活躍比例、每人每週提問數、每次提問平均呼叫幾次工具。</li>
+    <li><strong>商業</strong>：試用者的續訂率（與沒試用的訂戶比較）、從 AI 回答點回天下原文的比例、企業詢問與成交數。</li>
+    <li><strong>品質</strong>：評測題庫正確率、出處正確率、錯誤回報數。</li>
+  </ul>
 
   <h3>決策前要先回答的問題</h3>
   <ol>
@@ -488,9 +527,11 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
       <tr><td>FT 轉換率 290%</td><td>寫在 Ask FT（AI 問答）下</td><td>是「AI 付費牆」的成果，與 Ask FT 無關，且只涵蓋部分讀者</td></tr>
     </tbody>
   </table></div>
+  <h3>第 3 版：參考另一份 AI 報告的補充</h3>
+  <p>比對另一份 AI 製作的同主題報告（2026-09-30），核對原文後補入：中央社 robots.txt 的 AI 立場、服務條款重點、串接教學範圍、開發者實測的其他問題、TIME AI Agent 細節、Ask FT 現況、MT Newswires、技術中介服務（Cloudflare、TollBit、NLWeb、RSL）、第 0 步實測、試作規模、風險對策與追蹤指標。該報告所寫「Ask FT 先在 7,000 名訂戶測試、80% 認為有用、累計約 3.5 萬人使用」，以及華盛頓郵報 Ask The Post AI 的做法，未能找到原文，因此沒有採用。</p>
   <h3>仍未能核對原文的項目</h3>
   <ul>
-    <li>INSIDE、EnterpriseZine、Axios、Press Gazette 的網站拒絕連線，相關內容（TIME 的 AI 問答細節、Perplexity 分潤 80%）仍依搜尋摘要，已在文中標示。</li>
+    <li>INSIDE、EnterpriseZine、Press Gazette 的網站拒絕連線，相關內容（Perplexity 分潤 80%）仍依搜尋摘要，已在文中標示。</li>
     <li>中央社 MCP 每次查詢扣幾點：官網寫「約 1 次呼叫 1 點」，開發者實測是 2 點，兩者都列出。</li>
   </ul>
 </section>
@@ -510,6 +551,7 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li><a href="https://github.com/cofacts/kb/pull/27">Cofacts：中央社 MCP 專業 Subagent 可行性與必要性評估</a></li>
     <li><a href="https://github.com/school98072/cna-mcp-dataset-guide">GitHub：CNA MCP 數據地圖與點數實測報告</a></li>
     <li><a href="https://www.cna.com.tw/news/ait/202508285002.aspx">中央社：志明編輯助手亮相 AskCNA 成打假利器（2025-08-28）</a></li>
+    <li><a href="https://www.cna.com.tw/robots.txt">中央社 robots.txt</a>、<a href="https://www.cna.com.tw/about/info.aspx">中央社本社簡介</a></li>
     <li><a href="https://www.inside.com.tw/article/42265-2026-09-01-cna-mcp-taiwan-news-ai-reliable-source">INSIDE：讓 AI 不再已讀亂答！中央社推出台灣第一支新聞 MCP</a>（未能讀取原文）</li>
   </ul>
   <h3>日經 NIKKEI KAI MCP</h3>
@@ -533,7 +575,14 @@ blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line
     <li><a href="https://digiday.com/media/the-economist-licenses-its-content-to-enterprise-clients-private-llms/">Digiday：The Economist 授權企業私有 LLM</a></li>
     <li><a href="https://digiday.com/media/the-financial-times-ai-paywall-drove-conversions-up-290-now-its-learning-who-stays/">Digiday：FT 的 AI 付費牆讓轉換率提高 290%</a></li>
     <li><a href="https://www.niemanlab.org/2026/05/the-economist-launches-a-dedicated-chatgpt-app/">Nieman Lab：The Economist 推出 ChatGPT App</a></li>
-    <li><a href="https://www.axios.com/2025/11/10/time-ai-agent-ask">Axios：TIME 推出 AI 代理</a>（未能讀取原文）</li>
+    <li><a href="https://www.axios.com/2025/11/10/time-ai-agent-ask">Axios：TIME 推出 AI 代理</a></li>
+    <li><a href="https://www.fipp.com/news/time-unveils-ai-agent-to-transform-reader-interaction/">FIPP：TIME 推出 AI Agent</a>、<a href="https://digitalcontentnext.org/blog/2026/04/16/inside-times-rollout-of-its-timeai-interactive-agent/">Digital Content Next：TIME AI Agent 推出經過</a></li>
+    <li><a href="https://www.ftstrategies.com/en-gb/insights/whats-next-for-ask-ft">FT Strategies：What's next for Ask FT</a></li>
+    <li><a href="https://www.anthropic.com/news/advancing-claude-for-financial-services">Anthropic：Claude for Financial Services（LSEG、MT Newswires 連接器）</a></li>
+    <li><a href="https://blog.cloudflare.com/an-ai-index-for-all-our-customers/">Cloudflare：An AI Index for all our customers（2025-09）</a></li>
+    <li><a href="https://docs.tollbit.com/docs/other-access-methods.md">TollBit 文件：MCP 等 AI 存取端點</a></li>
+    <li><a href="https://news.microsoft.com/source/features/company-news/introducing-nlweb-bringing-conversational-interfaces-directly-to-the-web/">Microsoft：Introducing NLWeb</a></li>
+    <li><a href="https://rslstandard.org/">RSL（Really Simple Licensing）授權標準</a></li>
     <li><a href="https://www.lseg.com/en/solutions/ai-finance-solutions/lseg-mcp">LSEG MCP</a></li>
     <li><a href="https://finance.yahoo.com/news/dow-jones-factiva-surpasses-8-110000805.html">Dow Jones Factiva 取得 8,000 個以上來源的生成式 AI 授權（2026-01）</a></li>
     <li><a href="https://winbuzzer.com/2026/02/04/microsoft-publisher-content-marketplace-ai-licensing-xcxwbn/">Microsoft Publisher Content Marketplace（2026-02）</a></li>
