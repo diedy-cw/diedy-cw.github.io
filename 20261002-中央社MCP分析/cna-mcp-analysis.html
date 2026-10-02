@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中央社 MCP 評估</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 版面：單欄研究備忘錄，頂端先給結論，表格各自水平捲動 */
+:root{
+  --bg:#F5F7FA; --paper:#FFFFFF; --ink:#18212E; --muted:#5A6676;
+  --line:#D9DFE7; --soft:#EEF2F7;
+  --accent:#2C5A8C; --accent-soft:#E5EDF6;
+  --good:#1F7A4D; --good-soft:#E3F2EA;
+  --warn:#8A5A12; --warn-soft:#FBF1E0;
+  --bad:#A23B2E; --bad-soft:#F9E6E3;
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161D; --paper:#18202A; --ink:#E4E9F0; --muted:#9AA6B5;
+    --line:#2C3644; --soft:#1E2733;
+    --accent:#7FAEE0; --accent-soft:#1C2B3D;
+    --good:#6CC79A; --good-soft:#17302A;
+    --warn:#E0B263; --warn-soft:#30281A;
+    --bad:#EE8C7F; --bad-soft:#3A2220;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161D; --paper:#18202A; --ink:#E4E9F0; --muted:#9AA6B5;
+  --line:#2C3644; --soft:#1E2733;
+  --accent:#7FAEE0; --accent-soft:#1C2B3D;
+  --good:#6CC79A; --good-soft:#17302A;
+  --warn:#E0B263; --warn-soft:#30281A;
+  --bad:#EE8C7F; --bad-soft:#3A2220;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.8}
+.wrap{max-width:860px;margin:0 auto;padding-inline:20px;padding-block:40px 80px}
+header .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(28px,5vw,40px);line-height:1.3;margin:6px 0 10px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:900;font-size:24px;line-height:1.4;margin:0 0 14px;text-wrap:balance}
+h3{font-size:17px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px}
+.lede{color:var(--muted);max-width:65ch}
+.meta{font-size:13px;color:var(--muted);font-family:var(--f-mono)}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{padding-block:34px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.verdict{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:22px 22px 10px;margin:26px 0 8px}
+.verdict .tag{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:2px 12px;margin-bottom:10px}
+.verdict p{font-size:17px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;padding:0;list-style:none}
+.toc a{display:inline-block;font-size:14px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);background:var(--paper)}
+.toc a:hover{border-color:var(--accent);color:var(--accent)}
+ul,ol{padding-left:1.3em;margin:0 0 12px}
+li{margin-bottom:6px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.fact{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.fact b{display:block;font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.fact span{font-size:13px;color:var(--muted)}
+.tbl{overflow-x:auto;margin:12px 0 18px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.65}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--soft);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--soft);padding:1px 5px;border-radius:4px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:14px 0}
+.box{border-radius:8px;padding:14px 16px;min-width:0}
+.box h4{margin:0 0 6px;font-size:15px}
+.box ul{margin:0}
+.box.good{background:var(--good-soft)} .box.good h4{color:var(--good)}
+.box.warn{background:var(--warn-soft)} .box.warn h4{color:var(--warn)}
+.box.bad{background:var(--bad-soft)} .box.bad h4{color:var(--bad)}
+.box.info{background:var(--accent-soft)} .box.info h4{color:var(--accent)}
+blockquote{margin:12px 0;padding:4px 0 4px 16px;border-left:3px solid var(--line);color:var(--muted)}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:1px 9px;white-space:nowrap}
+.pill.go{background:var(--good-soft);color:var(--good)}
+.pill.mid{background:var(--warn-soft);color:var(--warn)}
+.pill.no{background:var(--bad-soft);color:var(--bad)}
+.phase{display:grid;grid-template-columns:88px 1fr;gap:14px;padding:14px 0;border-top:1px dashed var(--line)}
+.phase:first-of-type{border-top:0}
+.phase .when{font-family:var(--f-mono);font-size:13px;color:var(--accent);font-weight:500}
+.phase div{min-width:0}
+.phase h4{margin:0 0 4px;font-size:16px}
+.note{font-size:13.5px;color:var(--muted);background:var(--soft);border-radius:8px;padding:12px 14px;margin:14px 0}
+.src{font-size:13.5px}
+.src li{word-break:break-word}
+@media (max-width:520px){.phase{grid-template-columns:1fr;gap:4px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">競品分析 · 2026-10-02</div>
+  <h1>中央社 MCP：服務、評價與天下是否跟進</h1>
+  <p class="lede">中央社在 2026 年 8 月 31 日推出「中央社 MCP」，讓 ChatGPT、Claude 等 AI 工具可以直接查中央社的新聞資料庫，並附上出處。這份報告整理它怎麼運作、外界怎麼評、中央社自己怎麼說、國內外有誰做類似的事，最後評估天下雜誌是否值得效仿。</p>
+  <p class="meta">服務上線約 1 個月 · 資料來源見文末</p>
+
+  <div class="verdict">
+    <span class="tag">結論</span>
+    <p><strong>值得做，但不建議照抄中央社「個人每月 200 元」的賣法。</strong>中央社的優勢是量大、逐日的事實紀錄；天下的優勢是深度分析與獨家調查數據（例如 2000 大企業調查）。天下比較適合的路線是：先做內部版累積經驗，再把 MCP 存取當成數位訂閱的加值功能，最後把獨家數據包裝成企業方案（類似日經的 NIKKEI KAI MCP）。</p>
+  </div>
+
+  <ul class="toc">
+    <li><a href="#service">1. 服務內容</a></li>
+    <li><a href="#scenario">2. 應用情境</a></li>
+    <li><a href="#feedback">3. 外界評價</a></li>
+    <li><a href="#cna-view">4. 中央社的看法</a></li>
+    <li><a href="#others">5. 其他媒體怎麼做</a></li>
+    <li><a href="#cw">6. 天下是否效仿</a></li>
+    <li><a href="#sources">資料來源</a></li>
+  </ul>
+</header>
+
+<section id="service">
+  <h2>1. 服務內容：它是什麼、怎麼賣</h2>
+  <p>MCP（Model Context Protocol，模型上下文協定）是 Anthropic 在 2024 年 11 月提出的開放標準，常被比喻成「AI 的 USB-C」：資料提供者照這個規格做一個介面，各家 AI 工具就能直接接上去查資料。中央社 MCP 就是中央社替自家資料庫做的這個介面。</p>
+
+  <div class="facts">
+    <div class="fact"><b>近 500 萬則</b><span>1990 年至今的新聞稿（官網另寫 478 萬+）</span></div>
+    <div class="fact"><b>350 萬張</b><span>跨越百年的新聞照片</span></div>
+    <div class="fact"><b>2000 年起</b><span>世界年鑑資料庫</span></div>
+    <div class="fact"><b>約 150 個</b><span>政府機關公開資料</span></div>
+  </div>
+
+  <h3>兩種產品、兩種用法</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>方案</th><th>月費</th><th>怎麼用</th><th>適合誰</th></tr></thead>
+    <tbody>
+      <tr><td><strong>CNA MCP</strong></td><td class="num">NT$200</td><td>在 Claude、ChatGPT 等 AI 工具裡加掛中央社連接器，AI 回答時自動查中央社資料並標出處。每月約 500–700 點（早鳥加贈 200 點）。</td><td>已經在用 AI 工具的個人、開發者、研究者</td></tr>
+      <tr><td><strong>AskCNA</strong></td><td class="num">NT$300</td><td>中央社自己的 AI 問答網頁，電腦或手機瀏覽器打開就能問，內含 AI，不必另外訂閱其他 AI 服務。</td><td>不想自己設定的一般讀者</td></tr>
+      <tr><td>加購點數</td><td class="num">NT$100 / 250 點<br>NT$200 / 500 點</td><td>加購點數不會過期。</td><td>用量大的人</td></tr>
+    </tbody>
+  </table></div>
+  <p>中央社表示服務「從研究機關、學校至個人皆可使用」，涵蓋 B2B 與 B2C；目前公開的價格只有個人方案，機構方案未見公開價格。</p>
+
+  <h3>15 個工具（技術面）</h3>
+  <p>事實查核社群 Cofacts 實際串接後，公開了一份很詳細的觀察報告。整理如下：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>類別</th><th>工具</th><th>做什麼</th></tr></thead>
+    <tbody>
+      <tr><td>新聞搜尋</td><td><code>cna-news-qsearch</code>、<code>cna-news-single</code>、<code>cna-news-latest-newslist</code>、<code>cna-news-latest-category</code></td><td>關鍵字搜尋（可限語言、日期），一次合查新聞、年鑑、影像、專題；取單篇全文；看今日焦點與分類最新新聞。</td></tr>
+      <tr><td>事實查核</td><td><code>fact-check-guide</code>、<code>fact-check-review</code>、<code>fact-check-publish</code></td><td>提供查核方法、審查框架、輸出格式（查核報告、社群貼文、圖卡、新聞稿）。實測發現這幾個不會真的分析內容，只回傳固定的說明文字，讓 AI 照著做。</td></tr>
+      <tr><td>輔助查詢</td><td><code>cna-translation-lookup</code>、<code>cna-word-map</code>、<code>cna-photo-search</code>、<code>o-info-search</code></td><td>查中央社慣用譯名；延伸關鍵字；搜照片；合查政府公開資料、事實查核中心、中央社訊息平台。</td></tr>
+      <tr><td>視覺呈現</td><td><code>render-newspaper</code>、<code>render-knowledge-graph</code>、<code>render-timeline</code>、<code>render-brief</code></td><td>把結果排成報紙頭版、人物關係圖、時間軸、懶人包卡片。</td></tr>
+    </tbody>
+  </table></div>
+  <p>其他技術特點：認證用 API key（不走 OAuth），串接門檻低；已上架 Anthropic 官方的 Claude 連接器目錄，可以一鍵連接；工具說明是寫給 AI 看的操作手冊，查無結果時還會回傳「重試步驟」（先拿掉日期、再減少關鍵字、再查譯名）。</p>
+
+  <h3>演進過程</h3>
+  <ul>
+    <li><strong>2025-08-28</strong>：中央社媒體實驗室發表內部用的「志明編輯助手」，有 12 項 AI 功能（翻譯、抓錯字、下標題、配圖、查核提醒等），其中的 AskCNA 能用近 4 年新聞整理事件時間軸。開發經費來自 Google 新聞共榮基金與 nDX 台灣新聞數位創新計劃，耗時約一年。當時就說要「朝開放一般讀者邁進」。</li>
+    <li><strong>2026-08-31</strong>：對外推出中央社 MCP 與付費版 AskCNA，資料擴大到 1990 年以來。</li>
+  </ul>
+</section>
+
+<section id="scenario">
+  <h2>2. 應用情境</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>使用者</th><th>情境</th><th>中央社 MCP 幫上什麼</th></tr></thead>
+    <tbody>
+      <tr><td>事實查核者</td><td>查證謠言、政治人物發言</td><td>出處網址來自資料庫，AI 沒機會亂改；可同時查到政府澄清與查核中心報告。</td></tr>
+      <tr><td>記者、編輯</td><td>整理事件時間軸、找舊聞、查譯名</td><td>逐日新聞紀錄與年鑑；中央社慣用譯名（例如 Marco Rubio 譯「盧比歐」）。</td></tr>
+      <tr><td>研究者、學生</td><td>政策演變、歷史事件研究</td><td>1990 年起的新聞語料，可依日期篩選。</td></tr>
+      <tr><td>投資、金融研究</td><td>事件與股價關聯分析</td><td>新聞有精確到秒的發稿時間。已有開發者用它分析台積電 30 年新聞。</td></tr>
+      <tr><td>機關、學校、企業</td><td>內部 AI 助理需要可靠的台灣資料</td><td>給 AI 一個可引用的繁體中文來源，減少境外模型回答台灣議題時的錯誤。</td></tr>
+      <tr><td>一般讀者（AskCNA）</td><td>想問「某事件來龍去脈」</td><td>打開網頁直接問，答案附中央社新聞連結。</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="feedback">
+  <h2>3. 客戶與外界的評價</h2>
+  <p>服務上線才一個月，公開的使用心得還不多。目前找得到的意見分成三種：發布會來賓與媒體報導、Cofacts 的系統性實測、個別開發者的實測。PTT 等論壇沒有找到明顯討論。</p>
+
+  <h3>發布會來賓（正面）</h3>
+  <ul>
+    <li><strong>汪志堅</strong>（台北大學資管所特聘教授）：中央社開發 MCP「在台灣、亞洲乃至世界都是非常領先的」，除了幫 AI 辨識正確資料，「也有助於發展新商業模式」。</li>
+    <li><strong>謝吉隆</strong>（台大新聞所所長）：提供可信且明確的資料來源，「是極具前瞻性的發展」。</li>
+  </ul>
+  <p class="note">這兩位是受邀出席發布會的來賓，評語自然偏正面，參考時要考慮這一點。</p>
+
+  <h3>Cofacts 實測（最有參考價值）</h3>
+  <p>Cofacts 拿自家 AI 查核助理過去 7 個月的真實資料（1,162 筆紀錄、276 則使用者評分）來評估要不要接中央社 MCP，結論是<strong>「值得整合，理由是出處真的存在，不是資料比較多」</strong>。</p>
+  <div class="cols">
+    <div class="box good"><h4>做得好的地方</h4><ul>
+      <li>Cofacts 使用者的負評有 62% 跟出處有關，第一名是「提供不存在的出處」。中央社回傳的網址來自資料庫，能直接解決這個問題。</li>
+      <li>政治、政策、災害、國際新聞命中率高，例如中聯油脂、花蓮堰塞湖、青鳥行動都能查到完整時序。</li>
+      <li>單篇全文會把「今天」改寫成具體日期，對查核很有用。</li>
+      <li>譯名工具很實用。</li>
+    </ul></div>
+    <div class="box warn"><h4>發現的問題</h4><ul>
+      <li>關鍵字是嚴格比對：查「盧比奧 國務卿」只有 5 筆，改用中央社譯名「盧比歐」有 1,719 筆，差 344 倍，而且不會提醒。</li>
+      <li>「中央社訊息平台」的投稿、付費稿混在結果裡，容易被誤當成中央社新聞。</li>
+      <li>查核中心資料夾裡混有 Cofacts 自己的回應，可能造成循環引用。</li>
+      <li>年鑑的日期是出版年，不是事件年；部分結果沒有網址。</li>
+      <li>照片只能瀏覽，不能拿來用。</li>
+      <li>1990 年以前的事件、詐騙、生活常識類題目幫不上忙。</li>
+    </ul></div>
+  </div>
+  <p>報告也提到一個細節：查核輸出格式的規格書裡用了「222 法則」這個詞，原本是 2025 年民進黨秘書長徐國勇提出的輿情公關守則。中央社是國家通訊社，這類用詞容易被拿來做政治聯想，值得注意。</p>
+
+  <h3>開發者實測：點數用得比想像快</h3>
+  <p>一位開發者在 GitHub 公開實測：只問了 3 個問題，700 點就被扣掉 180 點（約 26%）。追查後發現是 AI 代理（agent）自動拆成約 90 次查詢，<strong>每次查詢扣 2 點</strong>（約 NT$0.57）。</p>
+  <ul>
+    <li>一般問答（每題查 1–2 次）：每月約可問 175–350 題，很划算。</li>
+    <li>讓 AI 代理自己跑大型任務（例如逐年統計）：一次可能用掉 60–120 點，一個月只夠做 5–10 次。</li>
+  </ul>
+  <p>作者的標題是〈拒絕黑盒〉，反映出<strong>點數計費不透明會讓使用者不安</strong>。這是天下若要做時最該先想清楚的地方。</p>
+  <p class="note">這份開發者報告中對資料總量的估算（850 萬至 1,000 萬篇）與中央社官方數字（近 500 萬則）不一致，資料量請以官方數字為準；點數計算部分則有實際截圖與紀錄佐證。</p>
+</section>
+
+<section id="cna-view">
+  <h2>4. 中央社自己怎麼看</h2>
+  <p>從社長胡婉玲在發布會的說法與中央社的報導，可以歸納出四個動機：</p>
+  <ol>
+    <li><strong>商業模式的第三次轉型。</strong>中央社成立 102 年，最早是 B2B，供稿給海內外媒體；1990 年代網路興起後改做 B2C，直接對讀者；現在進入 AI 時代，大家直接問 AI，網站面臨「零點擊」衝擊，所以要把新聞送進 AI 裡。</li>
+    <li><strong>台灣資訊主權。</strong>中央社認為 ChatGPT、Claude、Grok 這些模型多用境外資料訓練，回答台灣議題時「極可能衍生違背事實甚至立場偏誤的風險」，需要一個可信的台灣來源。</li>
+    <li><strong>繁體中文用語。</strong>讓 AI 使用中央社累積多年的繁中用語慣例與譯名。</li>
+    <li><strong>強制標註出處。</strong>改善 AI 回答新聞問題時「問 A 答 B」、沒有出處的問題。</li>
+  </ol>
+  <p>中央社把它定位成「台灣第一家」「繁體中文媒體之先」，強調可信與公共價值；價格訂得很低（每月 200 元），看起來更重視普及與影響力，短期營收不是主要目標。這跟中央社是政府捐助的國家通訊社有關，天下的處境不同。</p>
+</section>
+
+<section id="others">
+  <h2>5. 其他新聞媒體怎麼做</h2>
+  <p>台灣目前找不到其他新聞媒體推出 MCP。國外的做法大致分成五種：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>媒體</th><th>做法</th><th>對象</th><th>重點</th></tr></thead>
+    <tbody>
+      <tr><td><strong>日本經濟新聞</strong></td><td>NIKKEI KAI MCP<br><span class="meta">2026-09-01</span></td><td>企業</td><td>跟中央社最像，但只賣企業。可在 Copilot、ChatGPT、Claude 中查日經與產業報、地方報、產業報告共 2,000 萬篇以上文章，<strong>加上企業資料庫</strong>。依使用人數與用量計價。</td></tr>
+      <tr><td><strong>LSEG（路透）</strong></td><td>LSEG MCP</td><td>金融業</td><td>透過 MCP 提供財務數據與路透新聞，支援 Claude、ChatGPT、Copilot、Gemini 等，並做權限控管與資料來源追蹤。</td></tr>
+      <tr><td><strong>Dow Jones Factiva</strong></td><td>授權整合平台</td><td>企業</td><td>談下 8,000 家以上媒體的生成式 AI 使用授權，提供 Retrieval API，<strong>依每次 AI 查詢計次付費給媒體</strong>。小型媒體可以加入，不必自己開發。</td></tr>
+      <tr><td><strong>The Economist</strong></td><td>ChatGPT App（2026-05）＋企業 API（2026-08）</td><td>讀者／企業</td><td>ChatGPT App 只開放付費牆外的圖表（美國民調）。企業版讓客戶把內容接進自己的私有 LLM。態度是「謹慎控制開放範圍」。</td></tr>
+      <tr><td><strong>TIME</strong></td><td>自建 AI 代理＋管理 AI 爬蟲</td><td>讀者</td><td>用 102 年、約 75 萬筆封存資料做 AI 問答（與 Scale AI 合作）。2026-06 改成預設封鎖 AI 爬蟲，只放行約 70 個，並透過 TollBit 提供機器專用的精簡版本。態度是「要被 AI 用，就要最容易被用」。</td></tr>
+      <tr><td><strong>Financial Times</strong></td><td>Ask FT</td><td>訂戶</td><td>訂戶專屬 AI 問答。Digiday 報導 FT 的 AI 付費牆讓訂閱轉換率提高 290%。</td></tr>
+      <tr><td><strong>平台分潤</strong></td><td>Microsoft PCM（2026-02）、Perplexity Comet Plus</td><td>平台</td><td>媒體不必自己做 MCP，而是授權給平台，依 AI 引用次數分錢。微軟的合作夥伴包含 AP、Condé Nast、USA TODAY；Perplexity 把訂閱收入的 80% 分給媒體。</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">網路上也有「Guardian MCP」「Reuters MCP」等工具，但多半是第三方用公開 API 或爬蟲自己做的，不是媒體官方產品。</p>
+  <p>歸納起來：<strong>B2B 是目前主要收入來源</strong>（日經、LSEG、Factiva、The Economist 企業版）；B2C 多半是為了留住訂戶（FT、TIME）；中央社是少數直接對個人賣 MCP 的媒體。</p>
+</section>
+
+<section id="cw">
+  <h2>6. 天下雜誌是否值得效仿</h2>
+
+  <h3>天下與中央社的條件比較</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>面向</th><th>中央社</th><th>天下</th><th>對天下的意思</th></tr></thead>
+    <tbody>
+      <tr><td>內容類型</td><td>1990 年起近 500 萬則電稿，逐日事實紀錄</td><td>深度報導、分析、專題，篇數少很多</td><td><span class="pill mid">不同</span> 天下拼的不是「查得到」，而是「解釋得清楚」</td></tr>
+      <tr><td>獨家數據</td><td>年鑑、照片庫、譯名庫</td><td>2000 大企業調查、標竿企業聲望、縣市長施政滿意度、幸福城市等長年調查</td><td><span class="pill go">優勢</span> 結構化的獨家數據最適合給 AI 查，也最能賣給企業</td></tr>
+      <tr><td>收入模式</td><td>政府捐助，可以低價推廣</td><td>靠訂閱與廣告，有付費牆</td><td><span class="pill no">風險</span> 低價開放全文可能讓讀者不再訂閱</td></tr>
+      <tr><td>品牌</td><td>國家通訊社、可信</td><td>45 年財經雜誌、產業與政策權威</td><td><span class="pill go">優勢</span> 企業客戶認得天下</td></tr>
+      <tr><td>子品牌</td><td>單一</td><td>天下、康健、親子天下、天下學習等</td><td><span class="pill mid">機會</span> 康健可做健康查證、親子天下可做教育；但健康內容的責任風險較高</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>為什麼值得做</h3>
+  <ul>
+    <li><strong>零點擊是真的。</strong>讀者愈來愈常直接問 AI，天下若不在 AI 的答案裡，等於被忽略。做 MCP 可以確保 AI 引用天下時附上正確連結。</li>
+    <li><strong>台灣只有中央社做了。</strong>現在進場還算早，天下可以成為「財經與產業領域的可信來源」。</li>
+    <li><strong>獨家數據有 B2B 價值。</strong>日經的例子說明，「新聞＋企業資料」可以賣給企業的研究、策略、業務部門。</li>
+    <li><strong>技術門檻不高。</strong>中央社的工具設計已經公開可參考，難的是資料整理，不是寫程式。</li>
+  </ul>
+
+  <h3>要避開的坑（從中央社學到的）</h3>
+  <ul>
+    <li><strong>點數計費要透明。</strong>AI 代理會自動發出大量查詢，使用者看不懂扣點就會不安。建議以「次」或「月份額度」清楚顯示，並提供用量明細。</li>
+    <li><strong>資料要分類清楚。</strong>中央社把投稿、付費稿混入結果被批評。天下的業配、廣編特輯、活動稿必須標示或排除。</li>
+    <li><strong>授權範圍先盤點。</strong>外稿、譯稿、照片、圖表的授權不一定包含「給 AI 使用」。中央社照片只能瀏覽，就是這個原因。</li>
+    <li><strong>搜尋不能只靠嚴格關鍵字。</strong>譯名或用字差一個字就查不到，需要同義詞與語意搜尋。</li>
+    <li><strong>用詞保持中立。</strong>工具說明裡的用語也會被外界檢視。</li>
+  </ul>
+
+  <h3>建議的做法：分三階段</h3>
+  <div class="phase">
+    <div class="when">第 1 階段<br>約 3 個月</div>
+    <div><h4>內部版：先給編輯部與業務部用</h4><p>學中央社先做「志明編輯助手」再對外。把文章資料庫整理好（作者、日期、分類、授權、是否業配），做一個內部 MCP，讓記者查舊文、業務查企業報導。風險最低，也能驗證資料品質。可評估申請 Google 新聞相關補助。</p></div>
+  </div>
+  <div class="phase">
+    <div class="when">第 2 階段<br>約 6 個月</div>
+    <div><h4>訂戶加值：MCP 存取放進數位訂閱</h4><p>不另外賣 200 元方案，而是把「在 ChatGPT／Claude 中查天下全文」當作高階訂閱的功能，目標是提高續訂率（參考 FT）。非訂戶只能拿到標題、摘要與連結，引導回天下網站。</p></div>
+  </div>
+  <div class="phase">
+    <div class="when">第 3 階段<br>1 年內</div>
+    <div><h4>企業方案：獨家調查數據</h4><p>把 2000 大企業、標竿企業聲望等歷年調查做成可查詢的數據工具，賣給企業、法人、學校、研究機構（參考日經 NIKKEI KAI MCP）。這是最可能帶來實質營收的部分。</p></div>
+  </div>
+  <p>同時進行：評估加入 Microsoft PCM、Perplexity 等平台的分潤授權，並檢查目前網站對 AI 爬蟲的政策（參考 TIME 的白名單做法）。</p>
+
+  <h3>決策前要先回答的問題</h3>
+  <ol>
+    <li>天下歷年文章與調查數據有多少已經數位化、結構化？</li>
+    <li>哪些內容的授權允許給 AI 使用？外稿、照片要不要重新談？</li>
+    <li>開放 AI 查全文後，訂閱流失的風險有多大？要用什麼數字追蹤？</li>
+    <li>2000 大等調查數據，目前企業客戶怎麼買、願意付多少？</li>
+    <li>由誰負責？需要多少工程與資料整理人力？</li>
+  </ol>
+</section>
+
+<section id="sources">
+  <h2>資料來源</h2>
+  <p class="note">本環境的網路設定擋住了中央社官網（ask.cna.com.tw）與多數新聞網站，以上內容依據搜尋引擎提供的報導摘要，以及 Cofacts 與開發者在 GitHub 公開的實測報告整理。建議正式決策前再直接核對官網的方案與條款。</p>
+  <ul class="src">
+    <li><a href="https://ask.cna.com.tw/ask/index">中央社 AskCNA · CNA MCP 官網</a></li>
+    <li><a href="https://www.cna.com.tw/news/ait/202608310244.aspx">中央社：助 AI 導入正確資訊 中央社推首個台灣新聞 MCP 工具</a></li>
+    <li><a href="https://www.cna.com.tw/news/ait/202608310284.aspx">中央社：中央社 MCP 上線 解密 AI 小幫手</a></li>
+    <li><a href="https://www.rti.org.tw/news?uid=3&amp;pid=229289">中央廣播電臺：為 AI 掛上可信賴來源 中央社推出首個台灣新聞 MCP</a></li>
+    <li><a href="https://www.bnext.com.tw/article/92180/2026-cna-mcp">數位時代：中央社 MCP 是什麼？月費 200 元能買什麼？</a></li>
+    <li><a href="https://www.inside.com.tw/article/42265-2026-09-01-cna-mcp-taiwan-news-ai-reliable-source">INSIDE：讓 AI 不再已讀亂答！中央社推出台灣第一支新聞 MCP</a></li>
+    <li><a href="https://www.cryptocity.tw/news/cna-launches-mcp-subscription-service-for-ai-agents">動區：台媒首例！中央社推 MCP 訂閱服務</a></li>
+    <li><a href="https://blog.gslin.org/archives/2026/09/01/13170/%E4%B8%AD%E5%A4%AE%E7%A4%BE%E9%96%8B%E8%B3%A3-mcp-%E6%9C%8D%E5%8B%99/">Gea-Suan Lin's BLOG：中央社開賣 MCP 服務</a></li>
+    <li><a href="https://vocus.cc/article/6aa3af6bfd897800016129a3">方格子：以開發者角度看「中央社 MCP」</a></li>
+    <li><a href="https://github.com/cofacts/kb/pull/25">Cofacts：中央社 CNA MCP 能力觀察與 cofacts.ai 整合評估</a></li>
+    <li><a href="https://github.com/cofacts/kb/pull/27">Cofacts：中央社 MCP 專業 Subagent 可行性與必要性評估</a></li>
+    <li><a href="https://github.com/school98072/cna-mcp-dataset-guide">GitHub：CNA MCP 數據地圖與點數實測報告</a></li>
+    <li><a href="https://www.cna.com.tw/news/ait/202508285002.aspx">中央社：志明編輯助手亮相 AskCNA 成打假利器（2025-08）</a></li>
+    <li><a href="https://nkbb.nikkei.co.jp/kai/">日經：NIKKEI KAI</a>、<a href="https://prtimes.jp/main/html/rd/p/000000657.000011115.html">NIKKEI KAI MCP 提供開始（PR TIMES）</a></li>
+    <li><a href="https://www.lseg.com/en/solutions/ai-finance-solutions/lseg-mcp">LSEG MCP</a></li>
+    <li><a href="https://finance.yahoo.com/news/dow-jones-factiva-surpasses-8-110000805.html">Dow Jones Factiva 取得 8,000 家來源的生成式 AI 授權</a></li>
+    <li><a href="https://www.niemanlab.org/reading/how-time-the-economist-and-dow-jones-each-decided-what-to-expose-to-ai-agents/">Nieman Lab：TIME、The Economist、Dow Jones 如何決定開放什麼給 AI 代理</a></li>
+    <li><a href="https://www.niemanlab.org/2026/05/the-economist-launches-a-dedicated-chatgpt-app/">Nieman Lab：The Economist 推出 ChatGPT App</a></li>
+    <li><a href="https://digiday.com/media/the-economist-licenses-its-content-to-enterprise-clients-private-llms/">Digiday：The Economist 授權企業私有 LLM</a></li>
+    <li><a href="https://www.axios.com/2025/11/10/time-ai-agent-ask">Axios：TIME 推出 AI 代理</a></li>
+    <li><a href="https://digiday.com/media/the-financial-times-ai-paywall-drove-conversions-up-290-now-its-learning-who-stays/">Digiday：FT 的 AI 付費牆讓轉換率提高 290%</a></li>
+    <li><a href="https://winbuzzer.com/2026/02/04/microsoft-publisher-content-marketplace-ai-licensing-xcxwbn/">Microsoft Publisher Content Marketplace</a></li>
+    <li><a href="https://pressgazette.co.uk/news/perplexity-launches-ai-subscription-revenue-share-scheme-for-publishers/">Press Gazette：Perplexity 推出訂閱分潤方案</a></li>
+  </ul>
+</section>
+</div>
+</body>
+</html>
