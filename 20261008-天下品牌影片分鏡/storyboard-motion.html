@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天下品牌影片動畫分鏡表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@500;600&family=Roboto:wght@400;500;700&display=swap">
+<style>
+/* Layout: 白底新聞版面；先交代視覺系統與「一條紅線」的變化，再逐鏡列出，畫格內以紅線圖示標出該鏡的線條狀態 */
+:root {
+  --bg: #FFFFFF;
+  --bg-subtle: #F7F7F7;
+  --fg: #1A1A1A;
+  --fg-2: #48545D;
+  --fg-3: #7D8891;
+  --border: #D3D5D7;
+  --border-soft: #EEEEEE;
+  --red: #D60C18;
+  --red-faded: #FEEBEC;
+  --frame-bg: #FFFFFF;
+  --frame-border: #D3D5D7;
+  --frame-fg: #1A1A1A;
+  --frame-dim: #939EA7;
+  --seg-a: #1A1A1A;
+  --seg-b: #48545D;
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-serif: "Noto Serif TC", "PingFang TC", "Songti TC", serif;
+  --font-en: "Roboto", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15181B; --bg-subtle: #1D2125;
+    --fg: #F1F2F3; --fg-2: #C2C9CF; --fg-3: #8E99A2;
+    --border: #3A4148; --border-soft: #2A3036;
+    --red: #F0444D; --red-faded: #3A1A1C;
+    --frame-bg: #F4F5F6; --frame-border: #3A4148; --frame-fg: #1A1A1A; --frame-dim: #6B767F;
+    --seg-a: #F1F2F3; --seg-b: #A9B3BB;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15181B; --bg-subtle: #1D2125;
+  --fg: #F1F2F3; --fg-2: #C2C9CF; --fg-3: #8E99A2;
+  --border: #3A4148; --border-soft: #2A3036;
+  --red: #F0444D; --red-faded: #3A1A1C;
+  --frame-bg: #F4F5F6; --frame-border: #3A4148; --frame-fg: #1A1A1A; --frame-dim: #6B767F;
+  --seg-a: #F1F2F3; --seg-b: #A9B3BB;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-sans), var(--font-en);
+  font-size: 15px; line-height: 1.7;
+  padding: 0 20px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 80px; }
+.num { font-family: var(--font-en); font-variant-numeric: tabular-nums; }
+
+header.top { border-top: 4px solid var(--red); padding-top: 24px; display: grid; gap: 12px; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; color: var(--fg-3); font-weight: 500; }
+h1 { font-size: clamp(26px, 4vw, 34px); line-height: 1.25; font-weight: 900; margin: 0; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 28px; color: var(--fg-2); font-size: 14px; margin: 0; padding: 0; list-style: none; }
+.meta b { color: var(--fg); font-weight: 700; margin-left: 6px; }
+.intro { margin: 0; color: var(--fg-2); max-width: 46em; }
+
+h2 { font-size: 20px; font-weight: 700; margin: 0; text-wrap: balance; }
+section { margin-top: 48px; display: grid; gap: 16px; }
+.lead { color: var(--fg-2); margin: 0; max-width: 46em; }
+
+/* visual system */
+.system { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.sys { border: 1px solid var(--border); border-radius: 4px; padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
+.sys h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.sys p, .sys ul { margin: 0; color: var(--fg-2); }
+.sys ul { padding-left: 1.2em; display: grid; gap: 4px; }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.sw { display: grid; gap: 4px; font-size: 12px; color: var(--fg-3); }
+.sw i { display: block; width: 48px; height: 28px; border-radius: 2px; border: 1px solid var(--border); }
+
+/* line evolution */
+.line-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.ls { border: 1px solid var(--border); border-radius: 4px; padding: 12px; display: grid; gap: 6px; background: var(--bg); }
+.ls svg { width: 100%; height: 40px; display: block; }
+.ls b { font-size: 14px; }
+.ls span { font-size: 12px; color: var(--fg-3); }
+
+/* timeline */
+.timeline { display: grid; gap: 8px; }
+.bar { display: flex; height: 40px; border-radius: 2px; overflow: hidden; }
+.bar a { display: flex; align-items: center; justify-content: center; color: var(--bg); text-decoration: none; font-size: 13px; font-weight: 700; min-width: 0; white-space: nowrap; overflow: hidden; }
+.bar a:nth-child(odd) { background: var(--seg-a); }
+.bar a:nth-child(even) { background: var(--seg-b); }
+.bar a:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.ticks { position: relative; height: 18px; font-size: 12px; color: var(--fg-3); }
+.ticks span { position: absolute; transform: translateX(-50%); }
+.ticks span:first-child { transform: none; }
+.ticks span:last-child { transform: translateX(-100%); }
+
+/* segments & shots */
+.segment { margin-top: 40px; display: grid; gap: 0; scroll-margin-top: 16px; }
+.seg-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding-bottom: 12px; border-bottom: 2px solid var(--fg); }
+.seg-head .tc { color: var(--fg-3); font-size: 13px; }
+.seg-head .purpose { color: var(--fg-2); font-size: 14px; flex-basis: 100%; }
+.shot { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--border); }
+.frame {
+  aspect-ratio: 16 / 9; max-width: 100%; background: var(--frame-bg); color: var(--frame-fg);
+  border: 1px solid var(--frame-border); border-radius: 4px; padding: 12px 14px;
+  display: grid; grid-template-rows: auto 1fr auto; gap: 4px; position: relative; overflow: hidden;
+}
+.frame .no { font-family: var(--font-en); font-weight: 700; font-size: 26px; line-height: 1; }
+.frame .no small { font-size: 12px; font-weight: 500; color: var(--frame-dim); margin-left: 6px; letter-spacing: .06em; }
+.frame .dur { position: absolute; top: 12px; right: 14px; font-family: var(--font-en); font-size: 12px; color: var(--frame-dim); }
+.frame svg { width: 100%; height: 100%; min-height: 0; }
+.frame .kind { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+.frame .kind span { color: var(--frame-dim); font-weight: 400; font-size: 12px; }
+
+.detail { display: grid; gap: 12px; min-width: 0; }
+.vo { font-family: var(--font-serif); font-size: 21px; font-weight: 600; line-height: 1.5; margin: 0; text-wrap: balance; }
+.vo.none { font-family: var(--font-sans); font-size: 14px; font-weight: 400; color: var(--fg-3); }
+.vo::before { content: "旁白"; display: block; font-family: var(--font-sans); font-size: 12px; font-weight: 500; letter-spacing: .12em; color: var(--red); margin-bottom: 2px; }
+.vo.none::before { color: var(--fg-3); }
+dl.fields { display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: 6px 12px; margin: 0; }
+dl.fields dt { font-size: 12px; letter-spacing: .08em; color: var(--fg-3); padding-top: 3px; }
+dl.fields dd { margin: 0; color: var(--fg-2); }
+dl.fields dd.visual { color: var(--fg); }
+.card-text { display: inline-block; border: 1px solid var(--border); background: var(--bg-subtle); padding: 0 8px; border-radius: 2px; color: var(--fg); font-weight: 700; }
+
+/* script & tables */
+.script { background: var(--bg-subtle); border-left: 3px solid var(--red); padding: 20px 24px; display: grid; gap: 14px; }
+.script p { margin: 0; font-family: var(--font-serif); font-size: 18px; line-height: 1.8; }
+.script .lbl { display: block; font-family: var(--font-sans); font-size: 12px; color: var(--fg-3); letter-spacing: .08em; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+th { background: var(--bg-subtle); font-weight: 700; font-size: 13px; color: var(--fg-2); }
+tr:last-child td { border-bottom: 0; }
+td.tc { white-space: nowrap; color: var(--fg-2); }
+td.vo-cell { font-family: var(--font-serif); font-weight: 600; }
+td.st { white-space: nowrap; }
+.chk { color: var(--fg-2); }
+
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.note { border: 1px solid var(--border); border-radius: 4px; padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
+.note h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.note ul { margin: 0; padding-left: 1.2em; color: var(--fg-2); display: grid; gap: 4px; }
+.note.todo { border-color: var(--red); background: var(--red-faded); }
+
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--fg-3); }
+
+@media (max-width: 720px) {
+  body { padding: 0 16px; }
+  .shot { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .frame { max-width: 360px; }
+  .vo { font-size: 19px; }
+  .bar a { font-size: 11px; }
+  .bar a .t-long { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+body { margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p style="margin:0 0 16px;font-size:13px"><a href="./" style="color:var(--fg-2)">← 回到天下品牌影片分鏡</a></p>
+  <header class="top">
+    <div class="eyebrow">COMMONWEALTH MAGAZINE · BRAND FILM · MOTION VERSION</div>
+    <h1>天下雜誌品牌影片　動畫版分鏡表</h1>
+    <ul class="meta">
+      <li>片長<b class="num">90 秒</b></li>
+      <li>鏡頭<b class="num">15 個</b></li>
+      <li>製作方式<b>數位素材＋動態文字＋動畫</b></li>
+      <li>實拍<b>無</b></li>
+      <li>標語<b>陪你，看懂天下。</b></li>
+    </ul>
+    <p class="intro">旁白和段落時間與實拍版完全相同，可以共用同一份錄音。畫面改用天下既有的數位素材（封面、報導頁面、數據圖像、照片），搭配動態文字與動畫，不需要安排任何拍攝。</p>
+  </header>
+
+  <section aria-labelledby="sys-h">
+    <h2 id="sys-h">視覺系統</h2>
+    <div class="system">
+      <div class="sys">
+        <h3>色彩</h3>
+        <div class="swatches">
+          <div class="sw"><i style="background:#FFFFFF"></i>白底</div>
+          <div class="sw"><i style="background:#1A1A1A"></i>墨黑</div>
+          <div class="sw"><i style="background:#939EA7"></i>中灰</div>
+          <div class="sw"><i style="background:#D60C18"></i>天下紅</div>
+        </div>
+        <p>以白底和灰階為主。天下紅只用在「一條線」上，其他地方都不使用。</p>
+      </div>
+      <div class="sys">
+        <h3>字體</h3>
+        <ul>
+          <li>畫面大字：Noto Sans TC Black</li>
+          <li>引言與標語：Noto Serif TC</li>
+          <li>年份與數字：Roboto</li>
+        </ul>
+      </div>
+      <div class="sys">
+        <h3>動態原則</h3>
+        <ul>
+          <li>移動平穩、減速收尾，不用彈跳和炫光。</li>
+          <li>一次只讓一件事在動。</li>
+          <li>畫面上的文字和旁白同步出現。</li>
+        </ul>
+      </div>
+      <div class="sys">
+        <h3>無聲也看得懂</h3>
+        <p>每個鏡頭的關鍵字都會直接出現在畫面上。社群平台自動靜音播放時，觀眾不開聲音也能看懂完整訊息。</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="line-h">
+    <h2 id="line-h">主視覺：一條紅線</h2>
+    <p class="lead">一條天下紅的細線貫穿全片，用來代表天下的工作：追蹤、圈出、查證，最後成為標語下方的那條線。這條線會隨著段落改變形狀。</p>
+    <div class="line-strip" id="strip"></div>
+  </section>
+
+  <section aria-labelledby="tl-h">
+    <h2 id="tl-h">段落時間軸</h2>
+    <div class="timeline">
+      <nav class="bar" id="bar" aria-label="段落"></nav>
+      <div class="ticks num" id="ticks"></div>
+    </div>
+  </section>
+
+  <div id="shots"></div>
+
+  <section aria-labelledby="script-h">
+    <h2 id="script-h">完整旁白稿（與實拍版相同）</h2>
+    <p class="lead">語速建議每秒約 3 個字，句與句之間保留停頓。全文約 200 字。</p>
+    <div class="script" id="script"></div>
+  </section>
+
+  <section aria-labelledby="cut-h">
+    <h2 id="cut-h">30 秒版剪接對照</h2>
+    <p class="lead">沿用 90 秒版的動畫片段，不另外製作。鏡號對應上方分鏡。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>時間</th><th>使用鏡頭</th><th>旁白</th></tr></thead>
+        <tbody id="cut"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="asset-h">
+    <h2 id="asset-h">數位素材清單</h2>
+    <p class="lead">全部是天下既有的素材，只需要調出檔案，不需要另外拍攝。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>素材</th><th>用在鏡頭</th><th>需要的格式</th></tr></thead>
+        <tbody id="assets"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="notes-h">
+    <h2 id="notes-h">製作備註</h2>
+    <div class="notes">
+      <div class="note">
+        <h3>和實拍版的差別</h3>
+        <ul>
+          <li>不需要選角、場地和拍攝日。</li>
+          <li>旁白、配樂、時間碼與實拍版相同，可以共用。</li>
+          <li>情感來源從「人物」改成「文字和紅線」，節奏要更精準地對齊旁白。</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>其他版本</h3>
+        <ul>
+          <li>9:16 直式版：版面以文字為主，重新排版就能完成，不必重做動畫。</li>
+          <li>15 秒版：只用鏡頭 3、10、15。</li>
+          <li>無聲版：關鍵字已經在畫面上，可以直接用於自動靜音播放。</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>製作分工</h3>
+        <ul>
+          <li>動態設計：負責全部 15 個鏡頭與紅線動畫。</li>
+          <li>資訊設計：負責鏡頭 6 的時間軸、鏡頭 9 的地圖、鏡頭 10 的流程。</li>
+          <li>聲音：負責旁白錄音、配樂和音效。</li>
+        </ul>
+      </div>
+      <div class="note todo">
+        <h3>製作前要確認</h3>
+        <ul>
+          <li>鏡頭 8 的報導段落請用示意文字，避免截取真實報導，被誤解成引用內容。</li>
+          <li>鏡頭 1、2 的標題文字要模糊處理，不可辨識內容，也不出現其他媒體品牌。</li>
+          <li>數據圖像需要調出原始檔（向量或分層檔），才能重新製作動畫。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>事實與用語依據：天下雜誌官網「關於我們」（web.cw.com.tw/aboutus）。創刊理念「積極、前瞻、放眼天下」與 AI 準則「人工審核、編輯、查證」皆依原文。</footer>
+</div>
+
+<script>
+const SEGMENTS = [
+  { id: "open",   name: "開場", long: "觀眾處境", start: 0,  end: 13, purpose: "標題文字越來越多，最後模糊成一片，呈現「知道很多，卻看不清楚」。" },
+  { id: "turn",   name: "轉折", long: "AI",       start: 13, end: 24, purpose: "AI 快速產生文字。畫面停下的那一刻，游標變成紅線，全片的主角登場。" },
+  { id: "proof",  name: "證據", long: "天下怎麼看", start: 24, end: 52, purpose: "紅線帶著觀眾走過天下真實的報導：追蹤、追查、圈出、提出解方。" },
+  { id: "method", name: "方法", long: "不變的事", start: 52, end: 62, purpose: "用流程動畫說明：AI 是助力，每篇內容都要通過人工審核、編輯與查證。" },
+  { id: "close",  name: "收尾", long: "理念與標語", start: 62, end: 90, purpose: "封面牆帶出創刊理念，雜亂的聲波收成一條直線，成為標語下方的紅線。" }
+];
+
+// 紅線狀態圖示（viewBox 0 0 120 40）
+const LINES = {
+  none:   { name: "尚未出現", desc: "只有灰階文字", svg: `<path d="M10 14h70M10 22h90M10 30h55" stroke="var(--frame-dim)" stroke-width="3" stroke-linecap="round" fill="none" opacity=".6"/>` },
+  cursor: { name: "游標", desc: "停住的游標變成紅色", svg: `<path d="M20 22h44" stroke="var(--frame-dim)" stroke-width="3" stroke-linecap="round" opacity=".5"/><path d="M70 10v24" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>` },
+  river:  { name: "河流", desc: "延伸成 15 年的時間軸", svg: `<path d="M4 26 C24 6, 40 36, 60 20 S 96 8, 116 22" stroke="var(--red)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="18" cy="17" r="3" fill="var(--red)"/><circle cx="60" cy="20" r="3" fill="var(--red)"/><circle cx="104" cy="16" r="3" fill="var(--red)"/>` },
+  circle: { name: "圈選", desc: "圈出要查的人名、數字、時間", svg: `<path d="M14 22h22M84 22h22" stroke="var(--frame-dim)" stroke-width="3" stroke-linecap="round" opacity=".5"/><path d="M48 22h24" stroke="var(--frame-fg)" stroke-width="3" stroke-linecap="round"/><ellipse cx="60" cy="22" rx="20" ry="11" stroke="var(--red)" stroke-width="2.5" fill="none"/>` },
+  map:    { name: "連線", desc: "串起數據與鄉鎮", svg: `<path d="M10 30 L34 14 L58 24 L82 10 L110 20" stroke="var(--red)" stroke-width="2.5" fill="none" stroke-linejoin="round"/><circle cx="10" cy="30" r="3" fill="var(--red)"/><circle cx="34" cy="14" r="3" fill="var(--red)"/><circle cx="58" cy="24" r="3" fill="var(--red)"/><circle cx="82" cy="10" r="3" fill="var(--red)"/><circle cx="110" cy="20" r="3" fill="var(--red)"/>` },
+  flow:   { name: "流程", desc: "穿過審核、編輯、查證", svg: `<path d="M6 20h108" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/><rect x="26" y="10" width="14" height="20" fill="var(--frame-bg)" stroke="var(--frame-fg)" stroke-width="2"/><rect x="53" y="10" width="14" height="20" fill="var(--frame-bg)" stroke="var(--frame-fg)" stroke-width="2"/><rect x="80" y="10" width="14" height="20" fill="var(--frame-bg)" stroke="var(--frame-fg)" stroke-width="2"/>` },
+  wave:   { name: "收斂", desc: "雜亂聲波收成一條直線", svg: `<path d="M4 20 L12 8 L20 32 L28 12 L36 28 L44 16 L52 22 L60 20 H116" stroke="var(--red)" stroke-width="2.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/><path d="M4 20 L14 30 L24 10 L34 26 L44 18" stroke="var(--frame-dim)" stroke-width="2" fill="none" opacity=".5"/>` },
+  under:  { name: "標語底線", desc: "成為標語下方的紅線", svg: `<rect x="30" y="8" width="60" height="12" rx="1" fill="var(--frame-fg)" opacity=".85"/><path d="M36 30h48" stroke="var(--red)" stroke-width="3" stroke-linecap="round"/>` }
+};
+
+const SHOTS = [
+  { seg: "open", t: [0, 4], kind: "動態文字", line: "none",
+    visual: "白底。大量標題文字條從畫面下方快速往上捲動，越來越密，開始互相重疊。",
+    vo: "", card: "", motion: "捲動速度逐漸加快。", audio: "通知音一層層疊加。", src: "模糊處理過的標題文字條（不可辨識內容）" },
+  { seg: "open", t: [4, 8], kind: "動態文字", line: "none",
+    visual: "文字條填滿畫面，變成一面灰色的文字牆。",
+    vo: "資訊每天大量湧現。", card: "大量湧現", motion: "關鍵字以墨黑大字浮在文字牆上方。", audio: "通知音持續。", src: "同鏡頭 1" },
+  { seg: "open", t: [8, 13], kind: "動態文字", line: "none",
+    visual: "前半句清楚出現；後半句出現時，背景的文字牆逐漸失焦。",
+    vo: "知道得更多，不等於看得更清楚。", card: "知道得更多，不等於看得更清楚。", motion: "背景模糊程度隨旁白逐漸加深。", audio: "所有聲音逐漸壓低。", src: "同鏡頭 1" },
+  { seg: "turn", t: [13, 18], kind: "介面動畫", line: "none",
+    visual: "畫面中央出現一個簡潔的對話框，一段回答逐字快速產生，很快填滿對話框。",
+    vo: "AI 能在幾秒內給出答案。", card: "幾秒內", motion: "文字產生的速度明顯快於人能閱讀的速度。", audio: "細碎的打字聲。", src: "模擬介面（不出現特定產品名稱）" },
+  { seg: "turn", t: [18, 24], kind: "介面動畫", line: "cursor",
+    visual: "文字產生完畢，所有內容淡出，只留下一個閃爍的游標。游標停止閃爍，變成天下紅，倒下成一條短短的橫線。",
+    vo: "答案越容易取得，判斷就越重要。", card: "判斷", motion: "游標變色是全片第一個紅色。", audio: "全部靜音，留約 1 秒空白。", src: "動畫製作" },
+  { seg: "proof", t: [24, 31], kind: "資料動畫", line: "river",
+    visual: "紅線向右延伸，彎成一條河的形狀，沿線依序出現三個節點：1996《環境台灣》封面、2006「看河十年後」劇照、2010「看河 III」劇照。線的尾端標上「15 年」。",
+    vo: "一條河的變化，天下持續追蹤 15 年。", card: "15 年", motion: "紅線以穩定速度向右生長，封面縮圖在節點上淡入。", audio: "主旋律進入，節奏平穩。", src: "第 181 期《環境台灣》封面；兩部紀錄片劇照" },
+  { seg: "proof", t: [31, 37], kind: "素材動態", line: "circle",
+    visual: "〈誰堆出垃圾山？〉的報導照片緩慢推近，標題文字在畫面左側出現，紅線在照片上圈出垃圾山的位置。",
+    vo: "誰堆出垃圾山？天下循線追查。", card: "誰堆出垃圾山？", motion: "照片做緩慢的推近與平移，不加濾鏡。", audio: "旋律延續。", src: "〈誰堆出垃圾山？〉報導照片與標題" },
+  { seg: "proof", t: [37, 44], kind: "動態文字", line: "circle",
+    visual: "一段報導文字（示意稿）。紅線依序圈出其中的人名、數字、時間，每圈一個，旁邊出現對應的標籤。",
+    vo: "人名、數字、時間，力求正確無誤。", card: "人名｜數字｜時間", motion: "三次圈選對齊旁白的三個詞。", audio: "每次圈選有輕微的筆觸聲。", src: "示意文字（不使用真實報導段落）" },
+  { seg: "proof", t: [44, 52], kind: "資料動畫", line: "map",
+    visual: "前半：〈花蓮震後追蹤：太魯閣上如何重建?〉的數據圖像逐層展開。後半：畫面轉為台灣地圖，鄉鎮的點逐一亮起，旁邊浮現微笑台灣護照的插圖。",
+    vo: "找出問題的真相，提出解決的可能性。", card: "真相｜解決的可能性", motion: "前半對應「真相」，後半對應「解決的可能性」，以紅線連接兩段畫面。", audio: "旋律漸強。", src: "數據圖像原始檔；台灣鄉鎮地圖；微笑護照圖檔" },
+  { seg: "method", t: [52, 62], kind: "流程動畫", line: "flow",
+    visual: "左側：一個簡化的 AI 圖示把散落的資料片段整理成一排。紅線帶著這排資料向右，依序穿過三道關卡「審核」「編輯」「查證」，最後組成一篇完整的報導頁面。",
+    vo: "天下以 AI 為助力，每一篇內容都經過人工審核、編輯與查證。", card: "審核｜編輯｜查證", motion: "每道關卡亮起的時間，對齊旁白唸到的那個詞。", audio: "旋律延續，每通過一道關卡有一個輕音。", src: "動畫製作；天下報導頁面版型" },
+  { seg: "close", t: [62, 69], kind: "素材動態", line: "none",
+    visual: "1981 年創刊號封面置中，接著歷年封面向四周快速鋪開，組成一面封面牆。",
+    vo: "1981 年創刊至今，", card: "1981", motion: "封面依時間順序由中心向外鋪開。", audio: "旋律推進。", src: "天下歷年封面圖檔" },
+  { seg: "close", t: [69, 79], kind: "動態文字", line: "none",
+    visual: "封面牆縮小、淡成灰色背景。「積極」「前瞻」「放眼天下」三個詞依序以大字出現；接著「更公平、美好的社會」以襯線字出現在下方。",
+    vo: "天下以積極、前瞻、放眼天下的角度，追求更公平、美好的社會。", card: "積極　前瞻　放眼天下", motion: "三個詞對齊旁白依序出現，停留到段落結束。", audio: "旋律到最高點。", src: "動態文字" },
+  { seg: "close", t: [79, 84], kind: "動畫", line: "wave",
+    visual: "開場的灰色文字牆再次出現，接著化成許多雜亂的聲波線條。其中一條逐漸平穩，變成天下紅的直線，其他線條淡出。",
+    vo: "在紛雜的資訊之中，天下是一束冷靜的聲音。", card: "一束冷靜的聲音", motion: "收斂的速度配合旁白，唸完時剛好成為直線。", audio: "旋律收到只剩單音。", src: "動畫製作（呼應鏡頭 1–3）" },
+  { seg: "close", t: [84, 87], kind: "品牌", line: "under",
+    visual: "白底。紅線移到畫面下方，天下 Logo 在上方浮現。",
+    vo: "天下，不只是一本雜誌。", card: "天下 Logo", motion: "Logo 淡入。", audio: "安靜。", src: "品牌 Logo 向量檔" },
+  { seg: "close", t: [87, 90], kind: "品牌", line: "under",
+    visual: "標語出現在 Logo 下方，紅線正好成為標語的底線。",
+    vo: "陪你，看懂天下。", card: "陪你，看懂天下。", motion: "標語淡入後靜止，最後 1 秒不再有任何動作。", audio: "結尾單音。", src: "品牌 Logo 向量檔" }
+];
+
+const STRIP = [
+  { line: "cursor", shots: "鏡頭 5" },
+  { line: "river",  shots: "鏡頭 6" },
+  { line: "circle", shots: "鏡頭 7、8" },
+  { line: "map",    shots: "鏡頭 9" },
+  { line: "flow",   shots: "鏡頭 10" },
+  { line: "wave",   shots: "鏡頭 13" },
+  { line: "under",  shots: "鏡頭 14、15" }
+];
+
+const CUT = [
+  { t: [0, 4],   shots: "1、2", vo: "資訊每天大量湧現，" },
+  { t: [4, 9],   shots: "3",    vo: "知道得更多，不等於看得更清楚。" },
+  { t: [9, 16],  shots: "9",    vo: "天下找出問題的真相，提出解決的可能性。" },
+  { t: [16, 24], shots: "10",   vo: "天下以 AI 為助力，每一篇內容都經過人工審核、編輯與查證。" },
+  { t: [24, 27], shots: "12（縮短）", vo: "積極、前瞻、放眼天下。" },
+  { t: [27, 30], shots: "14、15", vo: "陪你，看懂天下。" }
+];
+
+const ASSETS = [
+  { name: "第 181 期《環境台灣》封面", shots: "6", fmt: "高解析掃描檔" },
+  { name: "「看河十年後」「看河 III」紀錄片劇照", shots: "6", fmt: "高解析劇照" },
+  { name: "〈誰堆出垃圾山？〉報導照片與標題", shots: "7", fmt: "原始照片檔" },
+  { name: "〈花蓮震後追蹤：太魯閣上如何重建?〉數據圖像", shots: "9", fmt: "向量或分層原始檔" },
+  { name: "微笑台灣護照圖檔、台灣鄉鎮地圖", shots: "9", fmt: "向量檔" },
+  { name: "天下報導頁面版型", shots: "10", fmt: "設計原始檔或高解析截圖" },
+  { name: "1981 年創刊號與歷年封面", shots: "11", fmt: "統一尺寸的封面圖檔" },
+  { name: "天下 Logo", shots: "14、15", fmt: "向量檔" }
+];
+
+const tc = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const TOTAL = 90;
+const svg = key => `<svg viewBox="0 0 120 40" aria-hidden="true" preserveAspectRatio="xMidYMid meet">${LINES[key].svg}</svg>`;
+
+document.getElementById("strip").innerHTML = STRIP.map(s =>
+  `<div class="ls">${svg(s.line)}<b>${LINES[s.line].name}</b><span>${s.shots}｜${LINES[s.line].desc}</span></div>`
+).join("");
+
+document.getElementById("bar").innerHTML = SEGMENTS.map(s =>
+  `<a href="#${s.id}" style="flex:${s.end - s.start}" title="${s.name}｜${tc(s.start)}–${tc(s.end)}">${s.name}<span class="t-long">・${s.long}</span></a>`
+).join("");
+document.getElementById("ticks").innerHTML = [0, ...SEGMENTS.map(s => s.end)].map(m =>
+  `<span style="left:${(m / TOTAL) * 100}%">${tc(m)}</span>`
+).join("");
+
+let n = 0;
+document.getElementById("shots").innerHTML = SEGMENTS.map(seg => {
+  const rows = SHOTS.filter(s => s.seg === seg.id).map(s => {
+    n += 1;
+    const field = (k, v, cls = "") => v ? `<dt>${k}</dt><dd class="${cls}">${v}</dd>` : "";
+    return `<article class="shot">
+      <div class="frame" role="img" aria-label="鏡頭 ${n}，${esc(s.kind)}，紅線狀態：${LINES[s.line].name}">
+        <div class="no">${String(n).padStart(2, "0")}<small>SHOT</small></div>
+        <div class="dur">${s.t[1] - s.t[0]} 秒</div>
+        ${svg(s.line)}
+        <div class="kind">${esc(s.kind)}<span>紅線：${LINES[s.line].name}</span></div>
+      </div>
+      <div class="detail">
+        ${s.vo ? `<p class="vo">${esc(s.vo)}</p>` : `<p class="vo none">（無旁白）</p>`}
+        <dl class="fields">
+          <dt>時間</dt><dd class="num">${tc(s.t[0])}–${tc(s.t[1])}</dd>
+          ${field("畫面", esc(s.visual), "visual")}
+          ${field("畫面文字", s.card ? `<span class="card-text">${esc(s.card)}</span>` : "")}
+          ${field("動態", esc(s.motion))}
+          ${field("聲音", esc(s.audio))}
+          ${field("素材", esc(s.src))}
+        </dl>
+      </div>
+    </article>`;
+  }).join("");
+  return `<section class="segment" id="${seg.id}" aria-label="${seg.name}">
+    <div class="seg-head"><h2>${seg.name}｜${seg.long}</h2><span class="tc num">${tc(seg.start)}–${tc(seg.end)}</span><span class="purpose">${seg.purpose}</span></div>
+    ${rows}
+  </section>`;
+}).join("");
+
+document.getElementById("script").innerHTML = SEGMENTS.map(seg => {
+  const lines = SHOTS.filter(s => s.seg === seg.id && s.vo).map(s => esc(s.vo)).join("<br>");
+  return `<p><span class="lbl">${seg.name}</span>${lines}</p>`;
+}).join("");
+
+document.getElementById("cut").innerHTML = CUT.map(c =>
+  `<tr><td class="tc num">${tc(c.t[0])}–${tc(c.t[1])}</td><td>鏡頭 ${c.shots}</td><td class="vo-cell">${esc(c.vo)}</td></tr>`
+).join("");
+
+document.getElementById("assets").innerHTML = ASSETS.map(a =>
+  `<tr><td>${esc(a.name)}</td><td class="st">鏡頭 ${a.shots}</td><td class="chk">${esc(a.fmt)}</td></tr>`
+).join("");
+</script>
+</body>
+</html>
