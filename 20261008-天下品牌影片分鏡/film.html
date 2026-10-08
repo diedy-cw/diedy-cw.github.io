@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天下品牌動畫影片</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600&display=swap">
+<style>
+:root {
+  --bg: #FFFFFF; --bg-subtle: #F7F7F7; --fg: #1A1A1A; --fg-2: #48545D; --fg-3: #7D8891;
+  --border: #D3D5D7; --red: #D60C18;
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-serif: "Noto Serif TC", "PingFang TC", "Songti TC", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #15181B; --bg-subtle: #1D2125; --fg: #F1F2F3; --fg-2: #C2C9CF; --fg-3: #8E99A2; --border: #3A4148; --red: #F0444D; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #15181B; --bg-subtle: #1D2125; --fg: #F1F2F3; --fg-2: #C2C9CF; --fg-3: #8E99A2; --border: #3A4148; --red: #F0444D; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 0 20px; background: var(--bg); color: var(--fg); font-family: var(--font-sans); font-size: 15px; line-height: 1.7; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 40px 80px; display: grid; gap: 28px; }
+a { color: inherit; }
+.back { font-size: 13px; color: var(--fg-3); text-decoration: none; }
+.back:hover { color: var(--red); }
+header { border-top: 4px solid var(--red); padding-top: 24px; display: grid; gap: 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; color: var(--fg-3); font-weight: 500; }
+h1 { margin: 0; font-size: clamp(26px, 4vw, 34px); font-weight: 900; line-height: 1.25; }
+header p { margin: 0; color: var(--fg-2); max-width: 46em; }
+video { width: 100%; aspect-ratio: 16 / 9; display: block; background: #000; border: 1px solid var(--border); }
+.links { display: flex; flex-wrap: wrap; gap: 10px 20px; font-size: 14px; }
+.links a { color: var(--red); text-decoration: none; font-weight: 500; }
+.links a:hover { text-decoration: underline; }
+h2 { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
+section { display: grid; gap: 4px; }
+ul { margin: 0; padding-left: 1.2em; color: var(--fg-2); }
+li { margin: 4px 0; }
+li b { color: var(--fg); font-weight: 700; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { font-weight: 700; color: var(--fg-3); font-size: 12px; letter-spacing: .06em; }
+td:first-child { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--fg-3); }
+.table-scroll { overflow-x: auto; }
+footer { font-size: 12px; color: var(--fg-3); border-top: 1px solid var(--border); padding-top: 16px; }
+@media (max-width: 480px) { body { padding: 0 16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 回到天下品牌影片分鏡</a>
+  <header>
+    <div class="eyebrow">COMMONWEALTH MAGAZINE · BRAND FILM · MOTION</div>
+    <h1>天下雜誌品牌影片　動畫版成片（示意版）</h1>
+    <p>依<a href="storyboard-motion.html">動畫版分鏡表</a>製作，90 秒、1920×1080、每秒 30 格。15 個鏡頭的時間、畫面文字與紅線變化都和分鏡表一致。</p>
+  </header>
+
+  <video controls preload="metadata" playsinline>
+    <source src="film/cw-brand-film-motion-90s.mp4" type="video/mp4">
+  </video>
+
+  <div class="links">
+    <a href="film/cw-brand-film-motion-90s.mp4" download>下載 MP4</a>
+    <a href="film/cw-brand-film-motion-90s.srt" download>下載字幕檔（SRT）</a>
+    <a href="film/animation.html">開啟動畫原始檔（可拖曳時間軸逐格檢查）</a>
+  </div>
+
+  <section>
+    <h2>這一版是示意版</h2>
+    <ul>
+      <li><b>旁白：</b>還沒有錄音，先以字幕呈現完整旁白稿。錄好旁白後，對齊字幕時間放進去即可。</li>
+      <li><b>配樂與音效：</b>用程式合成的示意音軌，依分鏡表「聲音」欄安排（通知音、打字聲、21 秒的空白、圈選筆觸聲、關卡輕音、結尾單音）。正式版請換成作曲配樂。</li>
+      <li><b>素材：</b>封面、紀錄片劇照、垃圾山照片、微笑台灣護照都是灰階示意圖，畫面角落標有「示意圖」。數據圖像的數值是示意數據。</li>
+      <li><b>Logo：</b>先以「天下雜誌」文字示意，正式版請換成品牌向量檔。</li>
+      <li><b>鏡頭 8：</b>依分鏡表要求，報導段落用示意文字，人名「王大明」與數字都是虛構的。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>要換成真實素材時</h2>
+    <ul>
+      <li>畫面全部由 <code>film/animation.html</code> 依時間畫出，每個鏡頭是一個獨立函式（例如鏡頭 6 是 <code>sceneRiver</code>），把示意圖換成素材圖檔即可。</li>
+      <li>重新輸出影片：在 <code>film/tools</code> 執行 <code>python3 soundtrack.py music.wav</code>，再執行 <code>node render.mjs ../cw-brand-film-motion-90s.mp4 --audio music.wav</code>（需要 Node.js、Playwright 與 ffmpeg）。加上 <code>--no-subs</code> 可輸出不含字幕的版本。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>段落對照</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>時間</th><th>段落</th><th>鏡頭</th><th>紅線狀態</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:13</td><td>開場｜觀眾處境</td><td>1–3</td><td>尚未出現，只有灰階文字牆</td></tr>
+          <tr><td>0:13–0:24</td><td>轉折｜AI</td><td>4–5</td><td>游標停住、變紅、倒下成短線</td></tr>
+          <tr><td>0:24–0:52</td><td>證據｜天下怎麼看</td><td>6–9</td><td>河流 → 圈選 → 數據線變成地圖連線</td></tr>
+          <tr><td>0:52–1:02</td><td>方法｜不變的事</td><td>10</td><td>穿過審核、編輯、查證三道關卡</td></tr>
+          <tr><td>1:02–1:30</td><td>收尾｜理念與標語</td><td>11–15</td><td>雜亂聲波收成直線，成為標語底線</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>事實與用語依據：天下雜誌官網「關於我們」（web.cw.com.tw/aboutus）。</footer>
+</div>
+</body>
+</html>

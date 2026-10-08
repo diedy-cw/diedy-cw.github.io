@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天下品牌動畫原始檔</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;900&family=Roboto:wght@400;500;700&display=swap">
+<style>
+/* 動畫原始檔：畫面全部由 renderAt(t) 依時間畫出，瀏覽器播放與逐格輸出用同一份程式 */
+:root { --bg: #FFFFFF; --fg: #1A1A1A; --fg-2: #48545D; --border: #D3D5D7; --red: #D60C18; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #15181B; --fg: #F1F2F3; --fg-2: #C2C9CF; --border: #3A4148; --red: #F0444D; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #15181B; --fg: #F1F2F3; --fg-2: #C2C9CF; --border: #3A4148; --red: #F0444D; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px 16px 40px; background: var(--bg); color: var(--fg); font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 12px; }
+canvas { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; border: 1px solid var(--border); background: #fff; }
+.bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--fg-2); }
+button { font: inherit; padding: 6px 14px; border: 1px solid var(--border); background: var(--bg); color: var(--fg); border-radius: 4px; cursor: pointer; }
+button:hover { border-color: var(--red); }
+input[type=range] { flex: 1; min-width: 160px; accent-color: var(--red); }
+.tc { font-family: Roboto, sans-serif; font-variant-numeric: tabular-nums; min-width: 92px; }
+label { display: inline-flex; gap: 6px; align-items: center; }
+body.render { padding: 0; }
+body.render .wrap { max-width: none; }
+body.render .bar { display: none; }
+body.render canvas { width: 1920px; border: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <canvas id="c" width="1920" height="1080" role="img" aria-label="天下雜誌品牌影片動畫版，90 秒"></canvas>
+  <div class="bar">
+    <button id="play" type="button">播放</button>
+    <input id="seek" type="range" min="0" max="90" step="0.01" value="0" aria-label="時間">
+    <span class="tc" id="tc">0:00.0 / 1:30</span>
+    <label><input id="subs" type="checkbox" checked> 字幕</label>
+  </div>
+</div>
+<script>
+const W = 1920, H = 1080, DURATION = 90;
+const C = {
+  bg: "#FFFFFF", ink: "#1A1A1A", g2: "#48545D", g3: "#7D8891", g4: "#939EA7",
+  g5: "#B8C0C6", g6: "#D3D5D7", g7: "#EEEEEE", g8: "#F6F7F8", red: "#D60C18"
+};
+const SANS = '"Noto Sans TC", "PingFang TC", sans-serif';
+const SERIF = '"Noto Serif TC", "Songti TC", serif';
+const EN = 'Roboto, "Helvetica Neue", Arial, sans-serif';
+
+const cv = document.getElementById("c");
+const ctx = cv.getContext("2d");
+let SHOW_SUBS = true;
+
+/* ---------- 共用工具 ---------- */
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eOut = k => 1 - Math.pow(1 - k, 3);
+const eInOut = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const fade = (t, inA, inB, outA = Infinity, outB = Infinity) => eInOut(prog(t, inA, inB)) * (1 - eInOut(prog(t, outA, outB)));
+function rng(seed) {
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let x = Math.imul(seed ^ seed >>> 15, 1 | seed); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
+}
+function mixHex(a, b, k) {
+  const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const A = p(a), B = p(b);
+  return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], k))).join(",")})`;
+}
+function font(size, weight = 400, family = SANS) { return `${weight} ${size}px ${family}`; }
+function text(str, x, y, o = {}) {
+  ctx.save();
+  ctx.font = font(o.size || 40, o.weight || 400, o.family || SANS);
+  ctx.textAlign = o.align || "left";
+  ctx.textBaseline = o.baseline || "alphabetic";
+  ctx.globalAlpha *= o.alpha ?? 1;
+  if (o.halo) { ctx.lineJoin = "round"; ctx.strokeStyle = o.haloColor || "#fff"; ctx.lineWidth = o.halo; ctx.strokeText(str, x, y); }
+  ctx.fillStyle = o.color || C.ink;
+  if (o.spacing) ctx.letterSpacing = o.spacing + "px";
+  ctx.fillText(str, x, y);
+  ctx.restore();
+}
+function measure(str, size, weight = 400, family = SANS) { ctx.save(); ctx.font = font(size, weight, family); const w = ctx.measureText(str).width; ctx.restore(); return w; }
+/* 浮現：淡入加上少量上移，只用減速收尾 */
+function riseText(str, x, y, t, t0, o = {}, dur = .7) {
+  const k = eOut(prog(t, t0, t0 + dur));
+  if (k <= 0) return;
+  text(str, x, y + (1 - k) * 18, { ...o, alpha: (o.alpha ?? 1) * k });
+}
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function polyline(pts, upto = 1) {
+  const n = pts.length; const last = (n - 1) * clamp(upto);
+  const i = Math.floor(last);
+  ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let j = 1; j <= i; j++) ctx.lineTo(pts[j][0], pts[j][1]);
+  if (i < n - 1) { const f = last - i; ctx.lineTo(lerp(pts[i][0], pts[i + 1][0], f), lerp(pts[i][1], pts[i + 1][1], f)); }
+}
+function redStroke(w = 6) { ctx.strokeStyle = C.red; ctx.lineWidth = w; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke(); }
+function sampleBezier(segs, per = 60) {
+  const out = [];
+  segs.forEach(([p0, p1, p2, p3], si) => {
+    for (let i = si ? 1 : 0; i <= per; i++) {
+      const u = i / per, v = 1 - u;
+      out.push([v*v*v*p0[0] + 3*v*v*u*p1[0] + 3*v*u*u*p2[0] + u*u*u*p3[0], v*v*v*p0[1] + 3*v*v*u*p1[1] + 3*v*u*u*p2[1] + u*u*u*p3[1]]);
+    }
+  });
+  return out;
+}
+function offscreen(w, h, draw) { const c = document.createElement("canvas"); c.width = w; c.height = h; draw(c.getContext("2d"), w, h); return c; }
+
+/* ---------- 旁白字幕（與分鏡表相同） ---------- */
+const VO = [
+  [4.3, 7.8, "資訊每天大量湧現。"],
+  [8.3, 12.8, "知道得更多，不等於看得更清楚。"],
+  [13.3, 17.8, "AI 能在幾秒內給出答案。"],
+  [18.3, 23.6, "答案越容易取得，判斷就越重要。"],
+  [24.3, 30.6, "一條河的變化，天下持續追蹤 15 年。"],
+  [31.3, 36.6, "誰堆出垃圾山？天下循線追查。"],
+  [37.3, 43.6, "人名、數字、時間，力求正確無誤。"],
+  [44.3, 51.6, "找出問題的真相，提出解決的可能性。"],
+  [52.3, 61.6, "天下以 AI 為助力，每一篇內容都經過人工審核、編輯與查證。"],
+  [62.3, 68.7, "1981 年創刊至今，"],
+  [69.3, 78.6, "天下以積極、前瞻、放眼天下的角度，追求更公平、美好的社會。"],
+  [79.3, 83.8, "在紛雜的資訊之中，天下是一束冷靜的聲音。"],
+  [84.3, 86.8, "天下，不只是一本雜誌。"]
+  /* 最後一句「陪你，看懂天下。」已經是畫面上的標語，不再重複字幕 */
+];
+function drawSubs(t) {
+  if (!SHOW_SUBS) return;
+  for (const [a, b, s] of VO) {
+    const al = fade(t, a, a + .25, b - .25, b);
+    if (al > 0) text(s, W / 2, 1024, { size: 38, weight: 500, align: "center", color: C.ink, alpha: al, halo: 10 });
+  }
+}
+
+/* ---------- 鏡頭 1–3、13：標題文字牆 ---------- */
+const STRIPS = (() => {
+  const r = rng(7), out = []; let y = 0;
+  const tones = [C.g6, C.g5, C.g4, C.g3];
+  while (y < 9600) {
+    const dense = clamp((y - 2400) / 2800);
+    const gap = lerp(115, 15, dense) * lerp(.8, 1.2, r());
+    const h = lerp(14, 26, r()) + dense * 12 * r();
+    const x0 = lerp(-40, 360, r()) * (1 - dense * .6);
+    const len = lerp(560, 1500, r()) + dense * 600;
+    const segs = []; let x = x0;
+    while (x < x0 + len) { const w = lerp(24, 150, r()); segs.push([x, w]); x += w + h * .55; }
+    out.push({ y, h, segs, tone: tones[Math.floor(r() * tones.length)], a: lerp(.55, .95, r()) });
+    y += gap;
+  }
+  return out;
+})();
+function wallScroll(t) {
+  if (t < 4) return 200 * t + 250 * t * t;                      // 0–4 秒逐漸加速
+  const v0 = 2200, u = Math.min(t - 4, 4);                      // 4–8 秒減速到緩慢漂移
+  const s = 4800 + v0 * u - (v0 - 100) * u * u / 8;
+  return t <= 8 ? s : s + 100 * (t - 8);
+}
+const wallLayer = document.createElement("canvas"); wallLayer.width = W; wallLayer.height = H;
+function sceneOpen(t) {
+  const blur = 16 * eInOut(prog(t, 8.6, 12.6));
+  const wa = 1 - eInOut(prog(t, 12.6, 13.3));
+  const wctx = wallLayer.getContext("2d");
+  wctx.clearRect(0, 0, W, H);
+  // 在離屏圖層畫文字牆，再整層套用模糊
+  drawWallTo(wctx, wallScroll(t));
+  ctx.save(); ctx.globalAlpha = wa * (1 - .35 * eInOut(prog(t, 8.6, 12.6)));
+  if (blur > .2) ctx.filter = `blur(${blur.toFixed(2)}px)`;
+  ctx.drawImage(wallLayer, 0, 0); ctx.restore();
+  // 鏡頭 2：關鍵字
+  riseText("大量湧現", W / 2, 590, t, 4.5, { size: 200, weight: 900, align: "center", halo: 40, alpha: 1 - eInOut(prog(t, 7.7, 8.2)) }, .8);
+  // 鏡頭 3：兩句依旁白出現
+  const oa = 1 - eInOut(prog(t, 12.5, 13.2));
+  riseText("知道得更多，", W / 2, 470, t, 8.4, { size: 108, weight: 900, align: "center", halo: 30, alpha: oa }, .8);
+  riseText("不等於看得更清楚。", W / 2, 630, t, 10.3, { size: 108, weight: 900, align: "center", halo: 30, alpha: oa }, .8);
+}
+function drawWallTo(c, scroll, alpha = 1) {
+  c.save();
+  for (const s of STRIPS) {
+    const y = H + s.y - scroll;
+    if (y < -60 || y > H + 60) continue;
+    c.globalAlpha = alpha * s.a; c.fillStyle = s.tone;
+    for (const [x, w] of s.segs) c.fillRect(x, y, w, s.h);
+  }
+  c.restore();
+}
+
+/* ---------- 鏡頭 4–5：AI 對話框與游標 ---------- */
+const ANSWER = "根據目前可以取得的資料，這個問題可以從幾個面向來看。首先，事件的背景牽涉多方說法，各自引用的數據並不一致；其次，相關單位已陸續公布初步調查，但細節仍有待確認。整體而言，影響範圍可能比外界預期更大，後續發展也取決於政策回應的速度。此外，不同來源對時間點的描述有落差，部分說法彼此矛盾，需要比對原始文件，才能釐清真正的因果關係。";
+const BOX = { x: 460, y: 250, w: 1000, h: 600 };
+let ANSWER_LINES = null;
+function layoutAnswer() {
+  const maxW = BOX.w - 120, lines = []; let cur = "";
+  ctx.save(); ctx.font = font(32, 400);
+  for (const ch of ANSWER) { if (ctx.measureText(cur + ch).width > maxW) { lines.push(cur); cur = ch; } else cur += ch; }
+  lines.push(cur); ctx.restore();
+  ANSWER_LINES = lines;
+}
+const CURSOR_REST = () => {
+  // 回答產生完畢時，游標所在位置
+  const li = ANSWER_LINES.length - 1;
+  return [BOX.x + 60 + measure(ANSWER_LINES[li], 32) + 6, BOX.y + 196 + li * 52];
+};
+function sceneAI(t) {
+  if (!ANSWER_LINES) layoutAnswer();
+  const boxA = fade(t, 13.2, 13.8, 18.2, 19.0);
+  const chars = Math.floor(clamp((t - 14.1) * 58, 0, ANSWER.length));
+  // 對話框
+  if (boxA > 0) {
+    ctx.save(); ctx.globalAlpha = boxA;
+    ctx.shadowColor = "rgba(26,26,26,.08)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 12;
+    rrect(BOX.x, BOX.y, BOX.w, BOX.h, 8); ctx.fillStyle = "#fff"; ctx.fill();
+    ctx.shadowColor = "transparent"; ctx.lineWidth = 2; ctx.strokeStyle = C.g6; ctx.stroke();
+    // 使用者的提問
+    const q = "這件事到底是怎麼回事？", qw = measure(q, 30) + 56;
+    rrect(BOX.x + BOX.w - 60 - qw, BOX.y + 50, qw, 64, 8); ctx.fillStyle = C.g7; ctx.fill();
+    text(q, BOX.x + BOX.w - 60 - qw / 2, BOX.y + 93, { size: 30, color: C.g2, align: "center" });
+    // 逐字產生的回答
+    let left = chars;
+    ANSWER_LINES.forEach((ln, i) => {
+      if (left <= 0) return;
+      const s = ln.slice(0, left); left -= ln.length;
+      text(s, BOX.x + 60, BOX.y + 196 + i * 52, { size: 32, color: C.g2 });
+    });
+    ctx.restore();
+  }
+  riseText("幾秒內", W / 2, 190, t, 14.6, { size: 96, weight: 900, align: "center", alpha: 1 - eInOut(prog(t, 18.0, 18.7)) }, .7);
+
+  // 游標：先跟著文字跑，產生完畢後閃爍，再移到中央、變紅、倒下
+  let cx, cy;
+  if (chars < ANSWER.length) {
+    let left = chars, li = 0;
+    while (li < ANSWER_LINES.length - 1 && left > ANSWER_LINES[li].length) { left -= ANSWER_LINES[li].length; li++; }
+    cx = BOX.x + 60 + measure(ANSWER_LINES[li].slice(0, left), 32) + 6; cy = BOX.y + 196 + li * 52;
+  } else [cx, cy] = CURSOR_REST();
+  const [rx, ry] = CURSOR_REST();
+  const m = eInOut(prog(t, 19.3, 20.5));
+  const tx = lerp(rx, 960, m), ty = lerp(ry, 610, m);
+  if (t >= 19.3) { cx = tx; cy = ty; }
+  if (t < 14.1) return;
+  const blinking = chars >= ANSWER.length && t < 20.9;
+  const on = !blinking || ((t - 17.3) % 1) < .55;
+  const red = eInOut(prog(t, 21.0, 21.35));
+  const fall = eInOut(prog(t, 21.6, 22.2));
+  const grow = eOut(prog(t, 22.2, 22.7));
+  const cursorA = t < 19.0 ? Math.max(boxA, 1) : 1;
+  if (t > 23.9 || !on) return;
+  ctx.save(); ctx.globalAlpha = cursorA;
+  const len = lerp(40, 40, fall) + grow * 40;
+  const wdt = lerp(4, 6, red);
+  ctx.translate(cx, cy + 8);            // 以游標底部為支點倒下
+  ctx.rotate(fall * Math.PI / 2);
+  ctx.strokeStyle = mixHex(C.ink, C.red, red); ctx.lineWidth = wdt; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -len); ctx.stroke();
+  ctx.restore();
+  riseText("判斷", 1000, 520, t, 22.5, { size: 180, weight: 900, align: "center", alpha: 1 - eInOut(prog(t, 23.2, 23.7)) }, .7);
+}
+
+/* ---------- 鏡頭 6：河流與 15 年 ---------- */
+const RIVER = sampleBezier([
+  [[160, 618], [380, 618], [420, 520], [640, 560]],
+  [[640, 560], [860, 600], [900, 700], [1140, 650]],
+  [[1140, 650], [1380, 600], [1440, 520], [1760, 560]]
+], 80);
+const riverAt = f => RIVER[Math.round(f * (RIVER.length - 1))];
+function coverArt(c, w, h, o) {
+  c.fillStyle = o.bg; c.fillRect(0, 0, w, h);
+  c.fillStyle = C.ink; c.font = font(o.mast, 900, SERIF); c.textBaseline = "top"; c.fillText("天下", w * .08, h * .05);
+  c.fillStyle = o.block; c.fillRect(w * .08, h * .3, w * .84, h * .42);
+  c.strokeStyle = o.lineTone; c.lineWidth = Math.max(1, w / 90);
+  c.beginPath(); c.moveTo(w * .08, h * .62); c.bezierCurveTo(w * .35, h * .5, w * .5, h * .7, w * .92, h * .55); c.stroke();
+  if (o.title) { c.fillStyle = C.ink; c.font = font(o.titleSize, 900, SANS); c.fillText(o.title, w * .08, h * .77); }
+  for (let i = 0; i < 2; i++) { c.fillStyle = C.g5; c.fillRect(w * .08, h * (.88 + i * .045), w * (i ? .4 : .6), h * .02); }
+}
+const COVER_1996 = offscreen(220, 290, (c, w, h) => coverArt(c, w, h, { bg: C.g8, mast: 40, block: C.g6, lineTone: C.g4, title: "環境台灣", titleSize: 26 }));
+function stillArt(c, w, h, seed) {
+  const r = rng(seed);
+  const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#E4E8EB"); g.addColorStop(1, "#C3CACF"); c.fillStyle = g; c.fillRect(0, 0, w, h);
+  c.fillStyle = "#AEB6BC"; c.beginPath(); c.moveTo(0, h * .45);
+  for (let x = 0; x <= w; x += w / 8) c.lineTo(x, h * (.35 + r() * .15)); c.lineTo(w, h); c.lineTo(0, h); c.fill();
+  c.fillStyle = "#EEF1F3"; c.beginPath(); c.moveTo(w * .1, h); c.bezierCurveTo(w * .4, h * .7, w * .3, h * .55, w * .62, h * .5); c.lineTo(w * .7, h * .52); c.bezierCurveTo(w * .45, h * .62, w * .62, h * .78, w * .45, h); c.fill();
+  c.fillStyle = "rgba(26,26,26,.5)"; c.font = font(14, 500); c.fillText("示意圖", w - 60, h - 12);
+}
+const STILL_2006 = offscreen(320, 180, (c, w, h) => stillArt(c, w, h, 3));
+const STILL_2010 = offscreen(320, 180, (c, w, h) => stillArt(c, w, h, 11));
+const NODES = [
+  { f: .12, img: COVER_1996, w: 200, h: 264, year: "1996", title: "《環境台灣》" },
+  { f: .44, img: STILL_2006, w: 320, h: 180, year: "2006", title: "看河十年後" },
+  { f: .76, img: STILL_2010, w: 320, h: 180, year: "2010", title: "看河 III" }
+];
+function sceneRiver(t) {
+  const out = 1 - eInOut(prog(t, 30.6, 31.1));
+  // 游標倒下後的短線先滑到左側起點
+  const slide = eInOut(prog(t, 23.4, 24.2));
+  if (t < 24.2) {
+    const x0 = lerp(960, 160, slide), y0 = lerp(618, 618, slide);
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + 80, y0); redStroke(6); return;
+  }
+  ctx.save(); ctx.globalAlpha = out;
+  const p = eInOut(prog(t, 24.2, 29.4));
+  const head = .05 + .95 * p;
+  polyline(RIVER, head); redStroke(6);
+  NODES.forEach((n, i) => {
+    if (head < n.f) return;
+    const [x, y] = riverAt(n.f);
+    const k = eOut(prog(t, 24.2 + 5.2 * n.f, 24.2 + 5.2 * n.f + .7));
+    ctx.save(); ctx.globalAlpha *= k;
+    ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fillStyle = C.red; ctx.fill();
+    ctx.strokeStyle = C.g6; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - 18); ctx.lineTo(x, y - 52); ctx.stroke();
+    const top = y - 60 - n.h;
+    ctx.shadowColor = "rgba(26,26,26,.12)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
+    ctx.drawImage(n.img, x - n.w / 2, top + (1 - k) * 16, n.w, n.h);
+    ctx.restore();
+    text(n.year, x, y + 76, { family: EN, size: 44, weight: 700, align: "center", alpha: out * k });
+    text(n.title, x, y + 120, { size: 28, color: C.g2, align: "center", alpha: out * k });
+  });
+  ctx.restore();
+  riseText("15 年", 1760, 800, t, 29.2, { size: 150, weight: 900, align: "right", alpha: out }, .8);
+}
+
+/* ---------- 鏡頭 7：誰堆出垃圾山？ ---------- */
+const PHOTO = offscreen(1200, 820, (c, w, h) => {
+  const r = rng(21);
+  const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "#EEF1F3"); g.addColorStop(.6, "#DDE2E5"); g.addColorStop(1, "#C7CED3");
+  c.fillStyle = g; c.fillRect(0, 0, w, h);
+  c.fillStyle = "#CDD3D7"; c.beginPath(); c.moveTo(0, 380);
+  for (let x = 0; x <= w; x += 60) c.lineTo(x, 330 + Math.sin(x / 140) * 30 + r() * 20); c.lineTo(w, h); c.lineTo(0, h); c.fill();
+  // 垃圾山
+  c.save(); c.beginPath(); c.moveTo(250, 640);
+  c.bezierCurveTo(380, 420, 520, 330, 640, 330); c.bezierCurveTo(780, 330, 900, 470, 1020, 640); c.closePath();
+  c.fillStyle = "#9AA3AA"; c.fill(); c.clip();
+  const tones = ["#6E7880", "#7D8891", "#8F99A1", "#A7B0B7", "#BCC3C9", "#5E676E"];
+  for (let i = 0; i < 2600; i++) { c.fillStyle = tones[Math.floor(r() * tones.length)]; c.fillRect(200 + r() * 860, 320 + r() * 330, 6 + r() * 26, 4 + r() * 14); }
+  c.restore();
+  c.fillStyle = "#B4BCC2"; c.fillRect(0, 630, w, h - 630);
+  for (let i = 0; i < 260; i++) { c.fillStyle = tones[Math.floor(r() * tones.length)]; c.globalAlpha = .5; c.fillRect(r() * w, 640 + r() * 170, 4 + r() * 18, 3 + r() * 8); }
+  c.globalAlpha = 1;
+  c.fillStyle = "rgba(26,26,26,.5)"; c.font = font(20, 500); c.fillText("示意圖", w - 90, h - 22);
+});
+function sceneMountain(t) {
+  const a = fade(t, 31.0, 31.7, 36.6, 37.1);
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  const fx = 760, fy = 140, fw = 1080, fh = 800;
+  const k = prog(t, 31.0, 37.0), s = 1 + .08 * k, px = -30 * k;
+  ctx.save(); ctx.beginPath(); ctx.rect(fx, fy, fw, fh); ctx.clip();
+  const iw = 1200 * s * .9, ih = 820 * s * .9;
+  const ox = fx + fw / 2 - iw / 2 + px, oy = fy + fh / 2 - ih / 2;
+  ctx.drawImage(PHOTO, ox, oy, iw, ih);
+  // 紅線圈出垃圾山的位置（跟著照片一起推近）
+  const d = eInOut(prog(t, 34.2, 35.2));
+  if (d > 0) {
+    const cx = ox + 640 * iw / 1200, cy = oy + 500 * ih / 820, rx = 430 * iw / 1200, ry = 210 * ih / 820;
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, -.06, -Math.PI * .65, -Math.PI * .65 + Math.PI * 2.08 * d); redStroke(7);
+  }
+  ctx.restore();
+  ctx.restore();
+  riseText("誰堆出", 120, 440, t, 31.6, { size: 104, weight: 900, family: SERIF, alpha: a }, .8);
+  riseText("垃圾山？", 120, 572, t, 31.9, { size: 104, weight: 900, family: SERIF, alpha: a }, .8);
+  riseText("天下循線追查", 124, 680, t, 33.7, { size: 40, weight: 500, color: C.g2, alpha: a }, .7);
+}
+
+/* ---------- 鏡頭 8：圈出人名、數字、時間 ---------- */
+const PARA = [
+  ["根據地方環保單位的統計，"],
+  ["自", ["2019 年 6 月", "time"], "起，該處每月新增的"],
+  ["廢棄物約", ["3,200 公噸", "num"], "，"],
+  ["負責現場稽查的", ["王大明", "name"], "坦言，"],
+  ["實際數量可能還要更多。"]
+];
+const MARKS = { name: { t: 37.7, label: "人名" }, num: { t: 38.7, label: "數字" }, time: { t: 39.7, label: "時間" } };
+function sceneCheck(t) {
+  const a = fade(t, 37.0, 37.5, 43.5, 44.0);
+  if (a <= 0) return;
+  const x0 = 640, y0 = 330, lh = 104, size = 56;
+  text("示意文字（非真實報導內容）", x0, y0 - 100, { size: 26, color: C.g4, alpha: a });
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = C.g6; ctx.fillRect(x0, y0 - 80, 80, 3); ctx.restore();
+  const dim = eInOut(prog(t, 40.6, 41.6));
+  PARA.forEach((parts, i) => {
+    let x = x0; const y = y0 + i * lh;
+    parts.forEach(p => {
+      const s = typeof p === "string" ? p : p[0];
+      const w = measure(s, size, 600, SERIF);
+      const key = typeof p === "string" ? null : p[1];
+      if (key) x += 26;
+      text(s, x, y, { size, weight: 600, family: SERIF, color: key ? C.ink : mixHex(C.g2, C.g5, dim), alpha: a });
+      if (key) {
+        const m = MARKS[key], d = eInOut(prog(t, m.t, m.t + .55));
+        if (d > 0) {
+          ctx.save(); ctx.globalAlpha = a;
+          ctx.beginPath(); ctx.ellipse(x + w / 2, y - size * .36, w / 2 + 22, 48, -.03, -Math.PI * .6, -Math.PI * .6 + Math.PI * 2.08 * d); redStroke(5);
+          ctx.restore();
+          riseText(m.label, x0 - 90, y, t, m.t + .1, { size: 36, weight: 700, align: "right", alpha: a }, .5);
+        }
+      }
+      x += w + (key ? 26 : 0);
+    });
+  });
+}
+
+/* ---------- 鏡頭 9：真相（數據圖像）與解決的可能性（地圖） ---------- */
+const DATA = [32, 28, 41, 38, 52, 47, 58, 66, 61, 72, 79, 86];
+const CH = { x: 220, y: 400, w: 1480, h: 470 };
+const chartPts = DATA.map((v, i) => [CH.x + 60 + i * (CH.w - 120) / 11, CH.y + CH.h - v / 100 * CH.h]);
+const geo = (lon, lat) => [1260 + (lon - 121) * 190, 520 - (lat - 23.6) * 208];
+const TAIWAN = [[121.52,25.30],[121.62,25.24],[121.75,25.15],[121.90,25.10],[122.00,25.01],[121.88,24.87],[121.84,24.70],[121.87,24.56],[121.80,24.38],[121.67,24.15],[121.60,24.00],[121.55,23.75],[121.48,23.45],[121.40,23.12],[121.25,22.90],[121.15,22.75],[121.00,22.55],[120.90,22.33],[120.86,22.10],[120.85,21.90],[120.74,21.94],[120.70,22.10],[120.62,22.30],[120.50,22.45],[120.35,22.55],[120.27,22.65],[120.20,22.85],[120.12,23.05],[120.10,23.25],[120.13,23.45],[120.17,23.65],[120.24,23.85],[120.36,24.05],[120.48,24.25],[120.62,24.45],[120.76,24.65],[120.90,24.85],[121.05,25.02],[121.22,25.12],[121.40,25.20]].map(([a, b]) => geo(a, b));
+const TOWNS = [[121.37,24.93],[121.91,25.02],[121.80,24.46],[121.62,24.12],[121.42,23.67],[121.22,23.10],[120.99,22.61],[120.83,22.02],[120.54,22.90],[120.15,23.46],[120.43,24.06],[121.00,24.60]].map(([a, b]) => geo(a, b));
+const DOTS = (() => {
+  const r = rng(5), out = [], p = new Path2D(); TAIWAN.forEach(([x, y], i) => i ? p.lineTo(x, y) : p.moveTo(x, y)); p.closePath();
+  while (out.length < 90) { const x = lerp(1100, 1440, r()), y = lerp(150, 880, r()); if (ctx.isPointInPath(p, x, y)) out.push([x, y, r()]); }
+  return out;
+})();
+const PASSPORT = offscreen(320, 440, (c, w, h) => {
+  c.fillStyle = C.g8; c.fillRect(0, 0, w, h); c.strokeStyle = C.g6; c.lineWidth = 2; c.strokeRect(1, 1, w - 2, h - 2);
+  c.fillStyle = C.ink; c.font = font(48, 900, SERIF); c.textAlign = "center"; c.fillText("微笑台灣", w / 2, 110);
+  c.font = font(30, 500, SANS); c.fillStyle = C.g2; c.fillText("護　照", w / 2, 160);
+  c.strokeStyle = C.g4; c.lineWidth = 3;
+  [[90, 250], [170, 290], [240, 240], [120, 340], [220, 360]].forEach(([x, y], i) => { c.beginPath(); c.arc(x, y, 30 + (i % 2) * 6, 0, Math.PI * 2); c.stroke(); });
+  c.fillStyle = "rgba(26,26,26,.5)"; c.font = font(16, 500); c.textAlign = "right"; c.fillText("示意圖", w - 14, h - 14);
+});
+function sceneTruth(t) {
+  if (t < 43.9 || t > 52.6) return;
+  const chartA = fade(t, 44.0, 44.6, 48.0, 48.6);
+  // 第一層：座標軸與格線
+  if (chartA > 0) {
+    ctx.save(); ctx.globalAlpha = chartA;
+    text("花蓮震後追蹤：太魯閣上如何重建?", CH.x, 220, { size: 34, weight: 500, color: C.g2 });
+    text("示意數據", CH.x + CH.w, 220, { size: 24, color: C.g4, align: "right" });
+    ctx.strokeStyle = C.g7; ctx.lineWidth = 2;
+    for (let i = 0; i <= 4; i++) { const y = CH.y + i * CH.h / 4; ctx.beginPath(); ctx.moveTo(CH.x, y); ctx.lineTo(CH.x + CH.w, y); ctx.stroke(); }
+    ctx.strokeStyle = C.g4; ctx.beginPath(); ctx.moveTo(CH.x, CH.y + CH.h); ctx.lineTo(CH.x + CH.w, CH.y + CH.h); ctx.stroke();
+    // 第二層：灰色長條
+    DATA.forEach((v, i) => {
+      const k = eOut(prog(t, 44.8 + i * .07, 45.5 + i * .07));
+      const bh = (v * .8) / 100 * CH.h * k, [x] = chartPts[i];
+      ctx.fillStyle = C.g6; ctx.fillRect(x - 34, CH.y + CH.h - bh, 68, bh);
+      text(`${i + 1} 月`, x, CH.y + CH.h + 44, { size: 24, color: C.g3, align: "center", alpha: k });
+    });
+    ctx.restore();
+    riseText("真相", CH.x, 340, t, 45.9, { size: 110, weight: 900, alpha: 1 - eInOut(prog(t, 48.0, 48.5)) }, .7);
+  }
+  // 第三層：紅色趨勢線，之後變形成地圖上的連線，最後拉直成鏡頭 10 的流程線
+  const draw = eInOut(prog(t, 46.0, 47.6));
+  const toMap = eInOut(prog(t, 48.4, 49.6));
+  const toFlow = eInOut(prog(t, 51.4, 52.4));
+  const flowPts = TOWNS.map((_, i) => [lerp(330, 1760, i / 11), 600]);
+  const pts = chartPts.map((p, i) => {
+    const m = [lerp(p[0], TOWNS[i][0], toMap), lerp(p[1], TOWNS[i][1], toMap)];
+    return [lerp(m[0], flowPts[i][0], toFlow), lerp(m[1], flowPts[i][1], toFlow)];
+  });
+  // 地圖
+  const mapA = fade(t, 48.6, 49.4, 51.2, 51.8);
+  if (mapA > 0) {
+    ctx.save(); ctx.globalAlpha = mapA;
+    ctx.beginPath(); TAIWAN.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+    ctx.fillStyle = C.g8; ctx.fill(); ctx.strokeStyle = C.g5; ctx.lineWidth = 2; ctx.stroke();
+    DOTS.forEach(([x, y, r]) => {
+      const k = eOut(prog(t, 49.2 + r * 1.6, 49.6 + r * 1.6));
+      ctx.globalAlpha = mapA * k; ctx.fillStyle = C.g4; ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha = fade(t, 50.2, 50.9, 51.2, 51.8);
+    ctx.shadowColor = "rgba(26,26,26,.12)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
+    ctx.drawImage(PASSPORT, 220, 400, 320, 440); ctx.restore();
+    riseText("解決的可能性", 160, 300, t, 48.8, { size: 104, weight: 900, alpha: 1 - eInOut(prog(t, 51.1, 51.7)) }, .7);
+  }
+  if (draw > 0) {
+    polyline(pts, draw); redStroke(6);
+    pts.forEach((p, i) => {
+      const on = draw >= i / 11 ? 1 : 0, dotA = on * (1 - toFlow);
+      if (dotA > 0) { ctx.save(); ctx.globalAlpha = dotA; ctx.beginPath(); ctx.arc(p[0], p[1], 8, 0, Math.PI * 2); ctx.fillStyle = C.red; ctx.fill(); ctx.restore(); }
+    });
+  }
+}
+
+/* ---------- 鏡頭 10：AI 是助力，人工審核、編輯、查證 ---------- */
+const GATES = [{ x: 760, t: 57.8, label: "審核" }, { x: 1060, t: 59.0, label: "編輯" }, { x: 1360, t: 60.2, label: "查證" }];
+const FRAGS = (() => { const r = rng(9); return Array.from({ length: 10 }, (_, i) => ({ sx: lerp(380, 980, r()), sy: lerp(260, 900, r()), w: lerp(.55, 1, r()), d: r() * .5, i })); })();
+function blockX(t) {
+  const K = [[55.6, 500], [57.6, 760], [57.9, 760], [58.8, 1060], [59.1, 1060], [60.0, 1360], [60.3, 1360], [60.9, 1640]];
+  if (t <= K[0][0]) return K[0][1];
+  for (let i = 0; i < K.length - 1; i++) if (t <= K[i + 1][0]) return lerp(K[i][1], K[i + 1][1], eInOut(prog(t, K[i][0], K[i + 1][0])));
+  return K[K.length - 1][1];
+}
+function sceneFlow(t) {
+  if (t < 52.4 || t > 62.3) return;
+  const a = 1 - eInOut(prog(t, 61.7, 62.2));
+  ctx.save(); ctx.globalAlpha = a;
+  ctx.beginPath(); ctx.moveTo(330, 600); ctx.lineTo(1760, 600); redStroke(6);
+  // AI 圖示
+  const ai = eOut(prog(t, 52.6, 53.3));
+  ctx.save(); ctx.globalAlpha *= ai;
+  rrect(170, 530, 140, 140, 16); ctx.fillStyle = "#fff"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = C.ink; ctx.stroke();
+  text("AI", 240, 622, { family: EN, size: 60, weight: 700, align: "center" });
+  ctx.restore();
+  riseText("助力", 240, 730, t, 53.1, { size: 34, weight: 500, color: C.g2, align: "center" }, .6);
+  // 三道關卡
+  GATES.forEach(g => {
+    const k = eOut(prog(t, 53.4, 54.0)), lit = eInOut(prog(t, g.t - .2, g.t + .2));
+    ctx.save(); ctx.globalAlpha *= k;
+    rrect(g.x - 70, 470, 140, 260, 6); ctx.fillStyle = "#fff"; ctx.fill();
+    ctx.lineWidth = lerp(2, 5, lit); ctx.strokeStyle = mixHex(C.g6, C.ink, lit); ctx.stroke();
+    ctx.restore();
+    text(g.label, g.x, 810, { size: 52, weight: 900, align: "center", color: mixHex(C.g5, C.ink, lit), alpha: k });
+  });
+  // 線穿過關卡（關卡畫在線上方，再補一次線，讓線看起來穿過去）
+  ctx.beginPath(); ctx.moveTo(330, 600); ctx.lineTo(1760, 600); redStroke(6);
+  // 散落的資料片段整理成一排
+  const gather = eInOut(prog(t, 53.4, 55.2));
+  const bx = blockX(t);
+  const pageK = eInOut(prog(t, 60.9, 61.6));
+  FRAGS.forEach(f => {
+    const g = eInOut(prog(t, 53.4 + f.d, 54.8 + f.d));
+    const tx = bx - 80 + (f.i % 2) * 86, ty = 470 + Math.floor(f.i / 2) * 24;
+    const x = lerp(f.sx, tx, g), y = lerp(f.sy, ty, g);
+    ctx.save(); ctx.globalAlpha *= eOut(prog(t, 53.0, 53.5)) * (1 - pageK);
+    ctx.fillStyle = mixHex(C.g5, C.g3, gather); ctx.fillRect(x, y, 76 * f.w, 14);
+    ctx.restore();
+  });
+  // 組成一篇完整的報導頁面
+  if (pageK > 0) {
+    const pw = 240, ph = 330, px = 1640 - pw / 2, py = 600 - ph - 20;
+    ctx.save(); ctx.globalAlpha *= pageK;
+    ctx.shadowColor = "rgba(26,26,26,.14)"; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10;
+    ctx.fillStyle = "#fff"; ctx.fillRect(px, py + (1 - pageK) * 20, pw, ph);
+    ctx.shadowColor = "transparent";
+    const oy = py + (1 - pageK) * 20;
+    ctx.fillStyle = C.ink; ctx.fillRect(px + 20, oy + 22, pw - 40, 22);
+    ctx.fillStyle = C.g7; ctx.fillRect(px + 20, oy + 60, pw - 40, 110);
+    for (let i = 0; i < 6; i++) { ctx.fillStyle = C.g5; ctx.fillRect(px + 20, oy + 190 + i * 22, (pw - 40) * (i === 5 ? .55 : 1), 10); }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+/* ---------- 鏡頭 11–12：封面牆與創刊理念 ---------- */
+const CW = 150, CHh = 200, GAP = 16, COLS = 13, ROWS = 6;
+const COVERS = (() => {
+  const r = rng(13), out = [];
+  const bgs = [C.g8, "#E9ECEE", "#DDE2E5", "#F2F3F4", "#E3E6E8"], blocks = [C.g6, C.g5, "#C9CED2", C.g4];
+  for (let row = 0; row < ROWS; row++) for (let col = 0; col < COLS; col++) {
+    const x = W / 2 + (col - (COLS - 1) / 2) * (CW + GAP), y = H / 2 + (row - (ROWS - 1) / 2 + .5) * (CHh + GAP);
+    out.push({ x, y, d: Math.hypot((x - W / 2) / (CW + GAP), (y - H / 2) / (CHh + GAP)), img: null, seed: r() });
+  }
+  out.sort((a, b) => a.d - b.d);
+  out.forEach((c, i) => {
+    const rr = rng(100 + i);
+    c.img = offscreen(CW, CHh, (cc, w, h) => coverArt(cc, w, h, { bg: bgs[Math.floor(rr() * bgs.length)], mast: 28, block: blocks[Math.floor(rr() * blocks.length)], lineTone: C.g4, title: null }));
+  });
+  return out;
+})();
+const FIRST = offscreen(300, 400, (c, w, h) => {
+  coverArt(c, w, h, { bg: C.g8, mast: 56, block: C.g6, lineTone: C.g4, title: "創刊號", titleSize: 34 });
+  c.fillStyle = C.g2; c.font = font(22, 500, EN); c.textBaseline = "top"; c.fillText("1981.6", w * .62, h * .08);
+});
+function sceneCovers(t) {
+  if (t < 62 || t > 79.3) return;
+  const wallA = (1 - .86 * eInOut(prog(t, 69.0, 70.4))) * (1 - eInOut(prog(t, 78.5, 79.2)));
+  const shrink = 1 - .14 * eInOut(prog(t, 69.0, 70.4));
+  const first = eOut(prog(t, 62.3, 63.1));
+  const settle = eInOut(prog(t, 63.9, 64.7));
+  ctx.save();
+  ctx.translate(W / 2, H / 2); ctx.scale(shrink, shrink); ctx.translate(-W / 2, -H / 2);
+  ctx.globalAlpha = wallA;
+  // 其他封面依時間順序由中心往外鋪開
+  COVERS.forEach((c, i) => {
+    if (i === 0) return;
+    const st = 64.5 + c.d * .55, k = eOut(prog(t, st, st + .5));
+    if (k <= 0) return;
+    ctx.save(); ctx.globalAlpha = wallA * k;
+    ctx.drawImage(c.img, c.x - CW / 2, c.y - CHh / 2 + (1 - k) * 10, CW, CHh); ctx.restore();
+  });
+  // 創刊號：先放大置中，再縮回牆上的位置
+  const c0 = COVERS[0];
+  const fw = lerp(300, CW, settle), fh = lerp(400, CHh, settle);
+  const fx = lerp(W / 2 + 110, c0.x, settle), fy = lerp(H / 2 - 30, c0.y, settle);
+  ctx.save(); ctx.globalAlpha = wallA * first;
+  if (settle < 1) { ctx.shadowColor = "rgba(26,26,26,.14)"; ctx.shadowBlur = 30 * (1 - settle); ctx.shadowOffsetY = 10; }
+  ctx.drawImage(FIRST, fx - fw / 2, fy - fh / 2, fw, fh); ctx.restore();
+  ctx.restore();
+  riseText("1981", W / 2 - 80, H / 2 + 20, t, 62.6, { family: EN, size: 170, weight: 700, align: "right", alpha: 1 - eInOut(prog(t, 63.6, 64.1)) }, .7);
+
+  // 鏡頭 12：創刊理念
+  const ta = 1 - eInOut(prog(t, 78.5, 79.2));
+  const words = [["積極", 70.4], ["前瞻", 71.3], ["放眼天下", 72.2]];
+  const size = 136, gap = 90;
+  const widths = words.map(([w]) => measure(w, size, 900));
+  let x = W / 2 - (widths.reduce((s, v) => s + v, 0) + gap * 2) / 2;
+  words.forEach(([w, st], i) => { riseText(w, x, 500, t, st, { size, weight: 900, alpha: ta, halo: 24 }, .8); x += widths[i] + gap; });
+  riseText("追求更公平、美好的社會", W / 2, 680, t, 74.6, { size: 64, weight: 600, family: SERIF, align: "center", color: C.g2, alpha: ta, halo: 18 }, .9);
+}
+
+/* ---------- 鏡頭 13：雜亂聲波收成一條直線 ---------- */
+const WAVES = (() => { const r = rng(17); return Array.from({ length: 34 }, (_, i) => ({ y: 90 + i * 27 + r() * 10, f: [lerp(.006, .016, r()), lerp(.02, .05, r()), lerp(.06, .11, r())], ph: [r() * 6, r() * 6, r() * 6], sp: [lerp(1, 3, r()), lerp(2, 5, r()), lerp(4, 8, r())], amp: lerp(30, 80, r()), tone: [C.g6, C.g5, C.g4][Math.floor(r() * 3)] })); })();
+function sceneWave(t) {
+  if (t < 78.9 || t > 84.6) return;
+  const wallA = fade(t, 79.0, 79.8, 80.0, 80.9);
+  if (wallA > 0) { ctx.save(); ctx.globalAlpha = wallA * .9; drawWallTo(ctx, 8200); ctx.restore(); }
+  const waveIn = eInOut(prog(t, 80.0, 81.0));
+  const calm = eInOut(prog(t, 81.2, 83.7));
+  const othersA = waveIn * (1 - eInOut(prog(t, 81.4, 83.2)));
+  const amp = (w, k) => w.amp * k;
+  const wavePath = (w, y0, A, x0 = 0, x1 = W) => {
+    ctx.beginPath();
+    for (let x = x0; x <= x1; x += 8) {
+      const v = Math.sin(x * w.f[0] + w.ph[0] + t * w.sp[0]) * .5 + Math.sin(x * w.f[1] + w.ph[1] + t * w.sp[1]) * .35 + Math.sin(x * w.f[2] + w.ph[2] - t * w.sp[2]) * .25;
+      const y = y0 + v * A;
+      x === x0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+  };
+  if (othersA > 0) {
+    ctx.save(); ctx.globalAlpha = othersA;
+    WAVES.forEach(w => { const y = lerp(w.y, 540, calm * .6); wavePath(w, y, amp(w, waveIn)); ctx.strokeStyle = w.tone; ctx.lineWidth = 2.5; ctx.lineJoin = "round"; ctx.stroke(); });
+    ctx.restore();
+  }
+  // 主角：其中一條逐漸平穩，變成天下紅
+  const main = WAVES[16];
+  const x0 = lerp(0, 160, calm), x1 = lerp(W, 1760, calm);
+  ctx.save(); ctx.globalAlpha = waveIn;
+  wavePath(main, lerp(main.y, 540, calm), 90 * waveIn * (1 - calm), x0, x1);
+  ctx.strokeStyle = mixHex(C.g4, C.red, eInOut(prog(t, 81.6, 82.6))); ctx.lineWidth = lerp(2.5, 6, calm); ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.stroke();
+  ctx.restore();
+  riseText("一束冷靜的聲音", W / 2, 470, t, 82.6, { size: 92, weight: 600, family: SERIF, align: "center", alpha: 1 - eInOut(prog(t, 84.0, 84.5)) }, .9);
+}
+
+/* ---------- 鏡頭 14–15：Logo 與標語 ---------- */
+const TAG = "陪你，看懂天下。", TAG_SIZE = 76;
+function sceneBrand(t) {
+  if (t < 84.0) return;
+  const tw = measure(TAG, TAG_SIZE, 600, SERIF);
+  const m = eInOut(prog(t, 84.4, 85.6));
+  const y = lerp(540, 722, m), x0 = lerp(160, W / 2 - tw / 2, m), x1 = lerp(1760, W / 2 + tw / 2, m);
+  ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); redStroke(6);
+  // Logo 位置先以文字標準字示意，正式版請換成品牌向量檔
+  const la = eInOut(prog(t, 85.4, 86.6));
+  text("天下雜誌", W / 2, 470, { size: 150, weight: 900, family: SERIF, align: "center", alpha: la, spacing: 12 });
+  text("CommonWealth Magazine", W / 2, 540, { family: EN, size: 34, weight: 500, align: "center", color: C.g2, alpha: la, spacing: 6 });
+  riseText(TAG, W / 2, 690, t, 87.0, { size: TAG_SIZE, weight: 600, family: SERIF, align: "center" }, 1.0);
+}
+
+/* ---------- 主繪製 ---------- */
+function renderAt(t) {
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.filter = "none";
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+  if (t < 13.4) sceneOpen(t);
+  if (t >= 13.1 && t < 24.0) sceneAI(t);
+  if (t >= 23.3 && t < 31.2) sceneRiver(t);
+  if (t >= 30.9 && t < 37.2) sceneMountain(t);
+  if (t >= 36.9 && t < 44.1) sceneCheck(t);
+  sceneTruth(t);
+  sceneFlow(t);
+  sceneCovers(t);
+  sceneWave(t);
+  sceneBrand(t);
+  drawSubs(t);
+  ctx.restore();
+}
+
+/* 確保所有用到的字都已載入（Google Fonts 的中文字依字元分批下載） */
+async function loadFonts() {
+  const all = [ANSWER, VO.map(v => v[2]).join(""), PARA.flat(2).join(""), "大量湧現知道得更多不等於看得更清楚幾秒內判斷這件事到底是怎麼回事？15年環境台灣看河十年後III誰堆出垃圾山？天下循線追查示意文字（非真實報導內容）人名數字時間花蓮震後追蹤：太魯閣上如何重建?示意數據真相解決的可能性微笑台灣護照123456789101112月助力審核編輯查證創刊號1981.6積極前瞻放眼天下追求更公平、美好的社會一束冷靜的聲音天下雜誌陪你，看懂天下。示意圖"].join("");
+  const specs = [`400 40px ${SANS}`, `500 40px ${SANS}`, `700 40px ${SANS}`, `900 40px ${SANS}`, `600 40px ${SERIF}`, `900 40px ${SERIF}`, `400 40px ${EN}`, `500 40px ${EN}`, `700 40px ${EN}`];
+  await Promise.all(specs.map(s => document.fonts.load(s, all).catch(() => {})));
+  await document.fonts.ready;
+}
+
+/* ---------- 播放控制 ---------- */
+const seek = document.getElementById("seek"), tcEl = document.getElementById("tc"), playBtn = document.getElementById("play");
+let playing = false, t0 = 0, base = 0, cur = 0;
+const fmt = s => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
+function show(t) { cur = t; renderAt(t); seek.value = t; tcEl.textContent = `${fmt(t)} / 1:30`; }
+function tick(now) {
+  if (!playing) return;
+  const t = base + (now - t0) / 1000;
+  if (t >= DURATION) { playing = false; playBtn.textContent = "重新播放"; show(DURATION); return; }
+  show(t); requestAnimationFrame(tick);
+}
+playBtn.addEventListener("click", () => {
+  if (playing) { playing = false; playBtn.textContent = "播放"; return; }
+  base = cur >= DURATION ? 0 : cur; t0 = performance.now(); playing = true; playBtn.textContent = "暫停"; requestAnimationFrame(tick);
+});
+seek.addEventListener("input", () => { playing = false; playBtn.textContent = "播放"; show(+seek.value); });
+document.getElementById("subs").addEventListener("change", e => { SHOW_SUBS = e.target.checked; show(cur); });
+
+if (new URLSearchParams(location.search).has("render")) document.body.classList.add("render");
+window.renderAt = renderAt;
+window.setSubs = v => { SHOW_SUBS = v; };
+window.ready = loadFonts().then(() => { layoutAnswer(); show(0); return true; });
+</script>
+</body>
+</html>
