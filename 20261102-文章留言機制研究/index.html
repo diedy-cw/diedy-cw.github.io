@@ -81,6 +81,11 @@ main { min-width: 0; padding: 0 48px 80px; }
 .cover-sub { font-size: 18px; color: var(--gray-dark); margin: 0 0 24px; line-height: 1.7; }
 .cover-meta { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 14px; color: var(--gray-dark); padding: 16px 0; border-top: 1px solid var(--gray-pastel); border-bottom: 1px solid var(--gray-pastel); margin-bottom: 28px; }
 .cover-meta b { color: var(--fg); font-weight: 500; margin-right: 6px; }
+.quick { display: grid; grid-template-columns: auto 1fr; gap: 2px 16px; align-items: baseline; padding: 18px 22px; margin: 0 0 20px; border: 1px solid var(--gray-bright); border-left: 4px solid var(--red); border-radius: 4px; color: var(--fg); transition: box-shadow 200ms var(--ease), border-color 200ms var(--ease); }
+.quick:hover { text-decoration: none; border-color: var(--gray); border-left-color: var(--red); box-shadow: 0 2px 8px rgba(26, 26, 26, .08); }
+.quick-label { grid-row: span 2; color: var(--red); font-weight: 700; font-size: 14px; letter-spacing: .06em; white-space: nowrap; }
+.quick-title { font-weight: 700; font-size: 17px; color: var(--blue); }
+.quick-desc { font-size: 14px; color: var(--gray-dark); line-height: 1.7; }
 .howto { background: var(--gray-faded); padding: 18px 22px; margin: 0 0 32px; font-size: 15px; line-height: 1.8; }
 .howto h2 { font-size: 15px; margin: 0 0 6px; }
 .howto ol { margin: 0; padding-left: 1.4em; }
@@ -195,6 +200,8 @@ h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1
   .cover h1 { font-size: 30px; }
   .cover-sub { font-size: 16px; }
   .cards { grid-template-columns: minmax(0, 1fr); }
+  .quick { grid-template-columns: minmax(0, 1fr); }
+  .quick-label { grid-row: auto; }
   .chapter { padding-top: 44px; }
   .ch-title { font-size: 25px; }
   .ch-mini ol { columns: 1; }
@@ -221,6 +228,7 @@ h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1
   <nav class="tabs" aria-label="章節"><a class="tab" href="#ch0" data-ch="0">總覽</a><a class="tab" href="#ch1" data-ch="1">紐約時報</a><a class="tab" href="#ch2" data-ch="2">國外財經</a><a class="tab" href="#ch3" data-ch="3">國外綜合與工具</a><a class="tab" href="#ch4" data-ch="4">台灣媒體</a></nav>
   <span class="current-ch" aria-live="polite"></span>
   <span class="header-spacer"></span>
+  <a class="btn btn-quick" href="https://diedy-cw.github.io/20261102-文章留言機制研究/slides.html" target="_blank" rel="noopener">簡報版</a>
   <div class="progress" aria-hidden="true"></div>
 </header>
 
@@ -242,9 +250,15 @@ h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1
         <span><b>篇幅</b>5 章・約 88 分鐘</span>
         <span><b>參考資料</b>約 251 條</span>
       </div>
+      <a class="quick" href="https://diedy-cw.github.io/20261102-文章留言機制研究/slides.html" target="_blank" rel="noopener">
+        <span class="quick-label">快速閱讀</span>
+        <span class="quick-title">先看簡報版：16 頁、約 5 分鐘掌握重點</span>
+        <span class="quick-desc">以「總覽與比較」為主，整理結論、六種模式、各家教訓與給天下的建議；每頁都連回本報告的對應段落。</span>
+      </a>
       <div class="howto">
         <h2>建議閱讀動線</h2>
         <ol>
+          <li>時間有限時，先看<a href="https://diedy-cw.github.io/20261102-文章留言機制研究/slides.html" target="_blank" rel="noopener">簡報版</a>。</li>
           <li>先讀<a href="#ch0">第 0 章「總覽與比較」</a>：一頁結論、六種模式與給天下的建議路線圖。</li>
           <li>再依關注深入：《紐約時報》個案在<a href="#ch1">第 1 章</a>，國外媒體在<a href="#ch2">第 2</a>、<a href="#ch3">3 章</a>，台灣在<a href="#ch4">第 4 章</a>。</li>
           <li>目錄（寬螢幕在左側，手機版在左上角）可搜尋段落標題；每章開頭有「本章段落」，結尾可直接跳到下一章；參考資料預設收合。</li>

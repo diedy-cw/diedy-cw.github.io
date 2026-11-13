@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文章留言機制研究｜簡報</title>
+<meta name="description" content="各家新聞媒體的文章留言機制研究，快速閱讀版簡報：機制、經營策展與反思的重點，以及給天下雜誌的建議。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #D60C18; --red-dark: #9D0505; --red-faded: #FEEBEC;
+  --gray-dark: #48545D; --gray: #939EA7; --gray-bright: #D3D5D7; --gray-pastel: #EEEEEE; --gray-faded: #F7F7F7;
+  --blue: #003A9F; --fg: #1A1A1A; --bg: #FFFFFF;
+  --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Roboto", sans-serif;
+  --serif: "Noto Serif TC", "PingFang TC", "Songti TC", serif;
+  --en: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --bar-h: 52px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: #2B3238; color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow: hidden; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* ---------- Deck mode ---------- */
+.stage { position: fixed; inset: 0 0 var(--bar-h) 0; overflow: hidden; }
+.deck { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: 0 0; }
+.slide { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--bg); padding: 52px 72px 64px; font-size: 23px; line-height: 1.6; overflow: hidden; }
+.slide.active { display: flex; }
+
+/* ---------- Slide parts ---------- */
+.s-top { display: flex; align-items: center; gap: 12px; font-size: .7em; color: var(--gray-dark); margin-bottom: 1.4em; letter-spacing: .04em; }
+.s-top::before { content: ""; width: 4px; height: 1.2em; background: var(--red); }
+.s-top b { color: var(--red); font-weight: 500; }
+.s-title { font-size: 1.9em; line-height: 1.35; font-weight: 700; margin: 0 0 .45em; letter-spacing: -0.01em; }
+.s-lead { font-size: 1em; color: var(--gray-dark); margin: 0 0 1em; max-width: 54em; }
+.s-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: .9em; }
+.s-foot { position: absolute; left: 72px; right: 72px; bottom: 22px; display: flex; justify-content: space-between; align-items: center; font-size: .62em; color: var(--gray); border-top: 1px solid var(--gray-pastel); padding-top: 10px; }
+.s-foot a { color: var(--gray-dark); }
+.s-foot a:hover { color: var(--blue); }
+.s-num { font-family: var(--en); }
+.red { color: var(--red); }
+.muted { color: var(--gray-dark); }
+.small { font-size: .78em; }
+.note { font-size: .72em; color: var(--gray); }
+
+.grid { display: grid; gap: .8em; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.card { border: 1px solid var(--gray-bright); border-radius: 4px; padding: .8em 1em; font-size: .82em; line-height: 1.6; background: var(--bg); }
+.card h3 { font-size: 1.12em; margin: 0 0 .35em; line-height: 1.4; }
+.card p { margin: 0; }
+.card ul { margin: 0; padding-left: 1.2em; }
+.card li { margin: .15em 0; }
+.card.accent { border-top: 3px solid var(--red); }
+.card.fill { background: var(--gray-faded); border-color: var(--gray-faded); }
+.card .tagline { display: block; font-size: .82em; color: var(--red); font-weight: 500; margin-bottom: .2em; letter-spacing: .04em; }
+.stat { display: flex; flex-direction: column; gap: .2em; }
+.stat .num { font-family: var(--en); font-size: 2.1em; font-weight: 700; line-height: 1.1; color: var(--red); }
+.stat .num small { font-size: .5em; font-weight: 500; color: var(--gray-dark); margin-left: .2em; }
+.stat .lab { font-size: .9em; }
+.pill { display: inline-block; font-size: .72em; padding: .1em .6em; border-radius: 2px; background: var(--gray-pastel); color: var(--gray-dark); margin: .15em .2em .15em 0; white-space: nowrap; }
+.pill.red { background: var(--red-faded); color: var(--red-dark); }
+
+table.t { width: 100%; border-collapse: collapse; font-size: .74em; line-height: 1.55; }
+table.t th, table.t td { text-align: left; vertical-align: top; padding: .5em .7em; border-bottom: 1px solid var(--gray-pastel); }
+table.t th { background: var(--gray-faded); font-weight: 700; white-space: nowrap; }
+table.t td:first-child { font-weight: 700; white-space: nowrap; }
+.t-wrap { overflow-x: auto; }
+
+/* Cover */
+.cover { justify-content: center; padding: 72px 96px; }
+.cover .eyebrow { color: var(--red); font-size: .8em; font-weight: 500; letter-spacing: .1em; margin: 0 0 1em; }
+.cover h1 { font-family: var(--serif); font-size: 2.7em; line-height: 1.3; margin: 0 0 .5em; letter-spacing: -0.01em; }
+.cover .sub { font-size: 1.05em; color: var(--gray-dark); margin: 0 0 1.6em; max-width: 36em; }
+.cover .meta { display: flex; gap: 2.4em; font-size: .78em; color: var(--gray-dark); border-top: 1px solid var(--gray-pastel); padding-top: 1em; flex-wrap: wrap; }
+.cover .meta b { color: var(--fg); font-weight: 500; margin-right: .5em; }
+.cover-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: var(--red); }
+.cta { display: inline-flex; align-items: center; gap: .6em; margin-top: 1.4em; font-size: .82em; border: 1px solid var(--gray-bright); border-radius: 4px; padding: .55em 1em; color: var(--fg); align-self: flex-start; }
+.cta:hover { text-decoration: none; border-color: var(--gray-dark); }
+.cta span { color: var(--blue); }
+
+/* Timeline (slide 3) */
+.shift { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 1.2em; align-items: stretch; }
+.shift .arrow { align-self: center; font-size: 1.8em; color: var(--red); font-family: var(--en); }
+.era { padding: 1em 1.2em; border-radius: 4px; font-size: .84em; }
+.era.old { background: var(--gray-faded); }
+.era.new { border: 1px solid var(--gray-bright); border-top: 3px solid var(--red); }
+.era h3 { margin: 0 0 .5em; font-size: 1.1em; }
+.era .yr { font-family: var(--en); color: var(--gray-dark); font-weight: 500; }
+.era ul { margin: 0; padding-left: 1.2em; }
+.era li { margin: .25em 0; }
+
+/* Flow (slide 11) */
+.flow { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5em; }
+.step { position: relative; border-top: 3px solid var(--red); background: var(--gray-faded); padding: .6em .6em .7em; font-size: .7em; line-height: 1.5; }
+.step b { display: block; font-size: 1.15em; margin-bottom: .3em; }
+.step .n { font-family: var(--en); color: var(--red); font-weight: 700; font-size: .95em; }
+
+/* Roadmap (slide 13) */
+.road { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 2px solid var(--gray-bright); }
+.phase { padding: 1em 1em 0 0; font-size: .78em; line-height: 1.6; position: relative; }
+.phase::before { content: ""; position: absolute; top: -8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--red); }
+.phase .when { font-family: var(--en); color: var(--gray-dark); font-size: .9em; margin-top: .4em; }
+.phase h3 { font-size: 1.15em; margin: .1em 0 .5em; }
+.phase ul { margin: 0; padding-left: 1.1em; }
+.phase li { margin: .2em 0; }
+
+/* Decision list */
+ol.dec { margin: 0; padding: 0; list-style: none; counter-reset: d; font-size: .82em; }
+ol.dec li { counter-increment: d; display: grid; grid-template-columns: 2em 1fr; gap: .4em; padding: .45em 0; border-bottom: 1px solid var(--gray-pastel); line-height: 1.5; }
+ol.dec li::before { content: counter(d); font-family: var(--en); font-weight: 700; color: var(--red); }
+
+/* Links slide */
+.chapters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .6em; }
+.chapters a { display: flex; flex-direction: column; gap: .3em; border: 1px solid var(--gray-bright); border-radius: 4px; padding: .8em; font-size: .74em; color: var(--fg); line-height: 1.5; }
+.chapters a:hover { text-decoration: none; border-color: var(--gray-dark); }
+.chapters .cn { font-family: var(--en); color: var(--red); font-weight: 700; }
+.chapters b { font-size: 1.1em; }
+.url { font-family: var(--en); font-size: .82em; word-break: break-all; }
+
+/* ---------- Controls ---------- */
+.bar { position: fixed; left: 0; right: 0; bottom: 0; height: var(--bar-h); background: #1F252A; color: #fff; display: flex; align-items: center; gap: 10px; padding: 0 16px; font-size: 14px; z-index: 10; }
+.bar .ctl { font: inherit; color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.28); border-radius: 4px; padding: 5px 12px; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.bar .ctl:hover { border-color: #fff; text-decoration: none; }
+.bar .ctl:disabled { opacity: .35; cursor: default; }
+.bar .count { font-family: var(--en); min-width: 64px; text-align: center; color: rgba(255,255,255,.85); }
+.bar .spacer { flex: 1; }
+.bar .hint { color: rgba(255,255,255,.55); font-size: 12px; }
+.progress { position: fixed; left: 0; bottom: var(--bar-h); height: 3px; background: var(--red); width: 0; z-index: 11; transition: width 200ms; }
+
+.overview { position: fixed; inset: 0 0 var(--bar-h) 0; background: rgba(31, 37, 42, .96); z-index: 20; overflow-y: auto; padding: 32px; display: none; }
+.overview.open { display: block; }
+.overview h2 { color: #fff; font-size: 18px; margin: 0 0 16px; font-weight: 500; }
+.ov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.ov-grid button { font: inherit; text-align: left; background: #fff; border: 0; border-radius: 4px; padding: 14px 16px; cursor: pointer; display: flex; gap: 10px; line-height: 1.5; font-size: 14px; color: var(--fg); border-top: 3px solid transparent; }
+.ov-grid button:hover, .ov-grid button.cur { border-top-color: var(--red); }
+.ov-grid .on { font-family: var(--en); color: var(--red); font-weight: 700; min-width: 22px; }
+
+/* ---------- Reflow mode (narrow screens): slides stack and scroll ---------- */
+body.reflow { overflow: auto; background: var(--bg); }
+body.reflow .stage { position: static; overflow: visible; }
+body.reflow .deck { position: static; width: auto; height: auto; transform: none !important; }
+body.reflow .slide { position: relative; display: flex; inset: auto; padding: 36px 18px 64px; font-size: 15px; border-bottom: 8px solid var(--gray-pastel); overflow: visible; }
+body.reflow .s-foot { left: 18px; right: 18px; bottom: 16px; }
+body.reflow .g2, body.reflow .g3, body.reflow .g4, body.reflow .chapters, body.reflow .road { grid-template-columns: minmax(0, 1fr); }
+body.reflow .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body.reflow .shift { grid-template-columns: minmax(0, 1fr); }
+body.reflow .shift .arrow { transform: rotate(90deg); justify-self: center; }
+body.reflow .phase { padding: 1em 0 1em 1.4em; border-left: 2px solid var(--gray-bright); }
+body.reflow .road { border-top: 0; }
+body.reflow .phase::before { top: 1.2em; left: -8px; }
+body.reflow .cover { min-height: 88vh; padding: 48px 22px; }
+body.reflow .cover h1 { font-size: 2.1em; }
+body.reflow .cover-bar { width: 6px; }
+body.reflow table.t { min-width: 560px; }
+body.reflow .bar .hint, body.reflow #prev, body.reflow #next, body.reflow .count { display: none; }
+body.reflow .progress { display: none; }
+body.reflow .stage { padding-bottom: var(--bar-h); }
+
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  body { overflow: visible; background: #fff; }
+  .bar, .progress, .overview { display: none !important; }
+  .stage { position: static; }
+  .deck { position: static; transform: none !important; width: 1280px; height: auto; }
+  .slide { position: relative; display: flex !important; width: 1280px; height: 720px; break-after: page; }
+}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide cover" data-title="封面">
+  <div class="cover-bar" aria-hidden="true"></div>
+  <p class="eyebrow">天下雜誌 2027 新機制規劃・研究簡報｜快速閱讀版</p>
+  <h1>各家新聞媒體的<br>文章留言機制研究</h1>
+  <p class="sub">從機制、經營策展到各家的反思，比較台灣媒體與國外重要財經、新聞媒體的做法，並以《紐約時報》為重點個案。</p>
+  <div class="meta">
+    <span><b>研究日期</b>2026-11-02</span>
+    <span><b>範圍</b>國外 28 家・台灣約 30 家</span>
+    <span><b>完整報告</b>5 章・約 88 分鐘・251 條參考資料</span>
+  </div>
+  <a class="cta" href="https://diedy-cw.github.io/20261102-文章留言機制研究/" target="_blank" rel="noopener">需要細節與出處時，閱讀完整報告<span>diedy-cw.github.io/20261102-文章留言機制研究</span></a>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-title="這份研究看什麼">
+  <div class="s-top"><b>研究範圍</b>文章留言機制研究</div>
+  <h2 class="s-title">三個關注重點，四組研究對象</h2>
+  <div class="s-body">
+    <div class="grid g3">
+      <div class="card accent"><span class="tagline">重點一</span><h3>機制</h3><p>誰能留言、哪些文章開放、開多久、怎麼審核、怎麼排序、用什麼系統。</p></div>
+      <div class="card accent"><span class="tagline">重點二</span><h3>經營與策展</h3><p>審核編制、編輯精選、記者參與、把留言轉成內容、與訂閱留存的關係。</p></div>
+      <div class="card accent"><span class="tagline">重點三</span><h3>反思</h3><p>關閉或改變的原因、公開數據、研究證據、外界批評與取捨。</p></div>
+    </div>
+    <div class="grid g4">
+      <div class="card fill"><h3>紐約時報</h3><p>重點個案：2007–2026 時間軸、先審制度、Moderator、NYT Picks。</p></div>
+      <div class="card fill"><h3>國外財經媒體</h3><p>WSJ、FT、Economist、Bloomberg、Reuters、日經、NewsPicks 等 13 家。</p></div>
+      <div class="card fill"><h3>國外綜合媒體</h3><p>Guardian、WaPo、Spiegel、NPR、Naver、Yahoo! 等 15 家，加上研究與工具。</p></div>
+      <div class="card fill"><h3>台灣媒體</h3><p>約 30 家媒體與平台，2026-11-02 逐一開啟文章頁實測。</p></div>
+    </div>
+    <p class="note">方法：公開網路資料查證。紐約時報、WSJ、FT 等官網無法直接擷取，部分現況依第三方報導；未查證之處在完整報告中逐項標示。</p>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-15" target="_blank" rel="noopener">完整報告：研究方法與限制</a><span class="s-num"></span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-title="結論：從關閉潮到縮小、付費、AI 化">
+  <div class="s-top"><b>一頁結論</b>文章留言機制研究</div>
+  <h2 class="s-title">「全站開放、事後清理」的時代結束了</h2>
+  <p class="s-lead">留言區沒有消失，而是變得更小、更貴、更依賴 AI 與編輯經營。</p>
+  <div class="s-body">
+    <div class="shift">
+      <div class="era old">
+        <h3>關閉潮 <span class="yr">2013–2018</span></h3>
+        <ul>
+          <li>Popular Science（2013）</li>
+          <li>Reuters（2014）、Bloomberg（2015）</li>
+          <li>NPR、Business Insider（2016）</li>
+          <li>The Atlantic（2018，改為讀者來信）</li>
+        </ul>
+        <p class="small muted" style="margin:.6em 0 0">共同理由：討論已移到社群、留言者只是少數、審核成本高。</p>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="era new">
+        <h3>縮小・付費・AI 化 <span class="yr">2023–2026</span></h3>
+        <ul>
+          <li>Spiegel（2023-12）關掉文章留言，改成每日議題、訂戶才能發言</li>
+          <li>Washington Post（2024-12）改為訂戶限定，加上 AI 提問與摘要</li>
+          <li>Daum（2026-03）恢復文章留言，導入 AI 排序</li>
+          <li>Nieman Lab（2026-01）：新聞室重新認真看待留言</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-1" target="_blank" rel="noopener">完整報告：第 0 章・一頁結論</a><span class="s-num"></span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-title="紐約時報">
+  <div class="s-top"><b>重點個案</b>紐約時報</div>
+  <h2 class="s-title">紐約時報二十年不變：精選開放 × 先審後發 × 編輯策展</h2>
+  <div class="s-body">
+    <div class="grid g3">
+      <div class="card accent"><h3>精選開放</h3><p>只在挑選過的文章開放，舊文章定期關閉。官方明說限制來自審核人力；突發新聞、爭議人物訃聞不開。</p></div>
+      <div class="card accent"><h3>先審後發</h3><p>每則留言審核通過才顯示。2017 年與 Jigsaw 推出 Moderator：機器只排序、自動核准低風險留言，<b>拒絕一律由人做</b>。</p></div>
+      <div class="card accent"><h3>編輯策展</h3><p>NYT Picks（編輯精選）、Reader Picks（讀者推薦）、From NYT（記者留言），另有彙整記者對話的 Conversations 頁。</p></div>
+    </div>
+    <div class="grid g3">
+      <div class="card stat"><span class="num">約 10%</span><span class="lab">2016 年開放留言的文章比例；導入 AI 後增加，但 80% 的目標沒有公開兌現</span></div>
+      <div class="card stat"><span class="num">14<small>人</small></span><span class="lab">2017 年審核編制，每天審約 1.1–1.2 萬則留言</span></div>
+      <div class="card stat"><span class="num">1,300<small>萬則</small></span><span class="lab">研究樣本：被選入 NYT Picks 後，留言品質與頻率都提升，<b>新手效果最大</b></span></div>
+    </div>
+    <p class="note">至今仍開放註冊使用者留言，沒有改為訂戶限定。Cooking 把留言改叫「Notes」，鼓勵實作經驗，被譽為全網最好的留言區。</p>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch1" target="_blank" rel="noopener">完整報告：第 1 章・紐約時報</a><span class="s-num"></span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-title="財經媒體分兩派">
+  <div class="s-top"><b>國外財經媒體</b>文章留言機制研究</div>
+  <h2 class="s-title">財經媒體分兩派：關掉留言，或把留言變成訂戶權益</h2>
+  <div class="s-body">
+    <div class="grid g2">
+      <div class="card fill">
+        <span class="tagline">關閉派</span><h3>Reuters・Bloomberg・Business Insider</h3>
+        <p>2014–2016 年陸續關閉。理由：討論已移到社群平台、留言者不代表整體讀者。</p>
+        <p class="small muted" style="margin-top:.6em">反證：CME 2020 年隨機實驗發現，關掉站內留言，讀者<b>不會</b>改去臉書留言，站上停留時間反而較低。</p>
+      </div>
+      <div class="card accent">
+        <span class="tagline">訂戶社群派</span><h3>FT・WSJ・Barron's・The Information</h3>
+        <p>只有付費會員能發言，留言成為看得到的訂閱權益與留存工具。</p>
+        <p class="small muted" style="margin-top:.6em">Barron's 更進一步：2025 年推出社群加價方案 Investor Circle。</p>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="card stat"><span class="num">11× <small>讀</small>／48× <small>寫</small></span><span class="lab">FT（2025）：讀留言、寫留言的人，黏著度相對一般活躍用戶的倍數。約一半讀者會看留言，只有 4% 會寫。屬相關性，不是因果。</span></div>
+      <div class="card stat"><span class="num">約 30<small>篇／天</small></span><span class="lab">WSJ（2019）：從全部開放縮到約四成，每串由記者先提問開場；審核員改名 audience voice reporters，任務改為從留言找新聞。</span></div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch2" target="_blank" rel="noopener">完整報告：第 2 章・國外財經媒體</a><span class="s-num"></span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-title="亞洲：專家評論路線">
+  <div class="s-top"><b>亞洲案例</b>文章留言機制研究</div>
+  <h2 class="s-title">亞洲走「專家評論」路線，最貼近天下的財經定位</h2>
+  <p class="s-lead">由受邀或認證的實名專家在文章下發表短評，與一般讀者留言分開。品質風險最低，本身就是內容產品。</p>
+  <div class="s-body">
+    <div class="grid g4">
+      <div class="card accent"><h3>日經 Think!</h3><ul><li>2020-12 上線</li><li>受邀專家約 150 人</li><li>從五種評論類型選一種投稿</li><li>讀者只能按「參考になった」</li></ul></div>
+      <div class="card accent"><h3>NewsPicks</h3><ul><li>留言本身就是產品</li><li>實名優先顯示</li><li>編輯部挑選的 Pro Picker 超過 200 人</li><li>以追蹤機制看專家觀點</li></ul></div>
+      <div class="card accent"><h3>Yahoo! ニュース</h3><ul><li>「エキスパート」認證專家</li><li>專家留言加「解說」標籤</li><li>與一般留言分開標示</li></ul></div>
+      <div class="card accent"><h3>關鍵評論網</h3><ul><li>網路沙龍採邀請制</li><li>留言旁顯示公司與職稱</li><li>曾把讀者觀點整理成文章</li></ul></div>
+    </div>
+    <div class="card fill"><b>要注意：</b>這不是雙向對話，比較像內容生產；要事先訂好利益揭露規範，並留意少數意見領袖聲量被放大。</div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c2-3" target="_blank" rel="noopener">完整報告：第 2 章・逐家分析（日經、NewsPicks）</a><span class="s-num"></span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-title="六種模式">
+  <div class="s-top"><b>模式分類</b>文章留言機制研究</div>
+  <h2 class="s-title">留言機制的六種模式</h2>
+  <div class="s-body">
+    <div class="t-wrap">
+    <table class="t">
+      <thead><tr><th>模式</th><th>核心做法</th><th>代表媒體</th><th>取捨</th></tr></thead>
+      <tbody>
+        <tr><td>A. 關閉，轉向社群</td><td>站內不開，互動交給社群平台</td><td>Reuters、Bloomberg、NPR；商周、遠見</td><td>零成本，但讀者關係與資料都在平台手上</td></tr>
+        <tr><td>B. 策展取代開放</td><td>編輯精選讀者來信或投書</td><td>The Atlantic、The Economist；天下獨評投書</td><td>品質最高，但互動是單向的</td></tr>
+        <tr><td>C. 精選開放 × 先審</td><td>挑文章開放、限時關閉、全面先審</td><td>紐約時報、WSJ、FT</td><td>品質可控，開放比例被人力鎖住</td></tr>
+        <tr><td>D. 訂戶限定社群</td><td>付費會員才能發言，其他人可讀</td><td>WSJ、FT、WaPo、Spiegel；端傳媒</td><td>付費門檻即篩選器，但需要經營才有人留</td></tr>
+        <tr><td>E. 主題辯論制</td><td>關掉文章留言，每天 2–4 題集中討論</td><td>Der Spiegel、Süddeutsche Zeitung</td><td>集中人力、通過率升到約 90%，但需要每天出題</td></tr>
+        <tr><td>F. 專家評論層</td><td>實名專家短評，與一般留言分開</td><td>日經 Think!、NewsPicks；關鍵評論網</td><td>品質風險最低，有利益衝突與同溫層疑慮</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-2" target="_blank" rel="noopener">完整報告：第 0 章・六種模式</a><span class="s-num"></span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-title="設計變數">
+  <div class="s-top"><b>機制設計</b>文章留言機制研究</div>
+  <h2 class="s-title">設計一套留言機制，要決定這幾件事</h2>
+  <div class="s-body">
+    <div class="t-wrap">
+    <table class="t">
+      <thead><tr><th>設計變數</th><th>選項光譜</th><th>各家的方向</th></tr></thead>
+      <tbody>
+        <tr><td>誰能發言</td><td>匿名 → 註冊 → 綁手機或實名 → 付費會員 → 受邀專家</td><td>先讓留言者付出成本、可被追責；「人人可讀、會員可寫」是主流</td></tr>
+        <tr><td>哪些文章開放</td><td>全部 → 精選文章 → 每日議題 → 不開</td><td>少而精；突發社會案件、訃聞、選舉政治新聞常被排除</td></tr>
+        <tr><td>開放多久</td><td>24 小時 → 2–4 天 → 不限</td><td>多數 24–72 小時</td></tr>
+        <tr><td>審核時點</td><td>先審 ↔ 先刊後審</td><td>先審保品質但慢；AI 讓先審的成本大幅下降</td></tr>
+        <tr><td>反應與排序</td><td>時間、讀者推薦、編輯精選、AI 排序</td><td>拿掉倒讚（Spiegel）；讀者推薦會獎勵黨派又不文明的留言，需要編輯精選平衡</td></tr>
+        <tr><td>記者參與</td><td>無 → 官方匿名帳號 → 具名記者 → 制度化</td><td><b>具名</b>才有效；讀者覺得記者會看，才更願意留言</td></tr>
+        <tr><td>系統</td><td>第三方外掛 → 商業平台 → 自建</td><td>資料要自己掌握</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-4" target="_blank" rel="noopener">完整報告：第 0 章・機制設計的關鍵變數</a><span class="s-num"></span></div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-title="經營與策展的共通做法">
+  <div class="s-top"><b>經營與策展</b>文章留言機制研究</div>
+  <h2 class="s-title">留下留言區的媒體，都在做這六件事</h2>
+  <div class="s-body">
+    <div class="grid g3">
+      <div class="card"><h3><span class="red">01</span>　審核員變讀者線記者</h3><p>WSJ 改名 audience voice reporters；FT 把過濾交給 AI，審核員轉做社群經營。</p></div>
+      <div class="card"><h3><span class="red">02</span>　記者先開口</h3><p>記者提問開場（WSJ）、AI 擬問題由編輯挑選（FT）。讀者不留言，常是因為沒被邀請。</p></div>
+      <div class="card"><h3><span class="red">03</span>　編輯精選平衡群眾投票</h3><p>NYT Picks 看廣度、深度、多元性，偏好長留言、個人經驗與論證。</p></div>
+      <div class="card"><h3><span class="red">04</span>　換個名稱，改變留言性質</h3><p>NYT Cooking 把留言叫「Notes」，引導讀者分享實作經驗。</p></div>
+      <div class="card"><h3><span class="red">05</span>　讓留言回流成內容</h3><p>讀者回應整理文、電子報單元、讀者徵集報導；端傳媒「拾論」、Barron's Community Conversations。</p></div>
+      <div class="card"><h3><span class="red">06</span>　專家與一般讀者分開</h3><p>日經、NewsPicks、Yahoo! 都把專家發言另外標示或另區呈現。</p></div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-5" target="_blank" rel="noopener">完整報告：第 0 章・經營與策展</a><span class="s-num"></span></div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-title="反思：各家學到的教訓">
+  <div class="s-top"><b>反思</b>文章留言機制研究</div>
+  <h2 class="s-title">研究與實務告訴我們的六個教訓</h2>
+  <div class="s-body">
+    <div class="grid g3">
+      <div class="card stat"><span class="num">0.06%</span><span class="lab"><b>留言者不等於讀者。</b>NPR 2016 年的留言全來自 0.06% 的使用者，其中 83% 是男性。留言不能當民意。</span></div>
+      <div class="card stat"><span class="num">-15%</span><span class="lab"><b>具名記者在場有用。</b>知名記者實際回應，不文明留言約少 15%；官方匿名帳號回應沒有效果（CME 2014）。</span></div>
+      <div class="card stat"><span class="num">少數人</span><span class="lab"><b>問題多出在重度使用者。</b>WSJ 發現重度留言者常沒讀完文章、違規率高；Naver 研究也顯示高頻者較有敵意。</span></div>
+      <div class="card stat"><span class="num">人力</span><span class="lab"><b>人力是開放比例的天花板。</b>AI 能擴大開放，但 NYT 仍堅持拒絕由人做，因為機器審核有隱性偏誤。</span></div>
+      <div class="card stat"><span class="num">≠</span><span class="lab"><b>文明不等於不極化。</b>造成態度極化的是立場不一致的留言，與是否文明無關（陳靜君、陶振超 2018）。審核目標應放在切題、有資訊、有經驗。</span></div>
+      <div class="card stat"><span class="num">相關≠因果</span><span class="lab"><b>黏著度數據要驗證。</b>FT 48 倍、The Times 3 倍，都可能只是忠實讀者本來就愛留言，需要用 A/B 實驗確認。</span></div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-6" target="_blank" rel="noopener">完整報告：第 0 章・反思</a><span class="s-num"></span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-title="趨勢：AI 與基礎設施">
+  <div class="s-top"><b>2024–2026 趨勢</b>文章留言機制研究</div>
+  <h2 class="s-title">AI 貫穿留言的每個階段，基礎設施也在洗牌</h2>
+  <div class="s-body">
+    <div class="flow">
+      <div class="step"><span class="n">1</span><b>引導開場</b>AI 依文章產生提問（WaPo、FT）</div>
+      <div class="step"><span class="n">2</span><b>寫之前提醒</b>送出前提醒用字，不快留言約少 24%（Yahoo!）</div>
+      <div class="step"><span class="n">3</span><b>審核</b>語境感知審核，會讀標題與內文（Naver）</div>
+      <div class="step"><span class="n">4</span><b>自動關閉</b>惡意留言超過門檻就關閉整篇（Yahoo!、Naver）</div>
+      <div class="step"><span class="n">5</span><b>排序精選</b>依建設性、多樣性排序（Yahoo!、Daum）</div>
+      <div class="step"><span class="n">6</span><b>摘要</b>把論點畫成圖表、分組摘要（Yahoo!、WaPo）</div>
+      <div class="step"><span class="n">7</span><b>編輯分析</b>用 LLM 整理大量留言供編輯參考</div>
+    </div>
+    <p class="small muted" style="margin:0">最成熟、最有數據的是「審核」與「寫之前提醒」；摘要各家都在試，都附有不保證正確的聲明。</p>
+    <div class="grid g2">
+      <div class="card accent"><span class="tagline">已停止</span><h3>臉書留言外掛：2026-02-10 停止顯示</h3><p>仍掛著外掛的網站，留言區都靜默消失。留言資料一直存在臉書那邊。</p></div>
+      <div class="card accent"><span class="tagline">即將停止</span><h3>Perspective API：2026-12-31 停止服務</h3><p>常見的 AI 毒性過濾服務，Coral 等系統預設串接。新系統不應再建立在它上面。</p></div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c3-24" target="_blank" rel="noopener">完整報告：第 3 章・生成式 AI 的新應用</a><span class="s-num"></span></div>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-title="台灣現況">
+  <div class="s-top"><b>台灣媒體</b>2026-11-02 實測</div>
+  <h2 class="s-title">台灣：財經雜誌多沒有站內留言，討論都在站外</h2>
+  <div class="s-body">
+    <div class="grid g4">
+      <div class="card fill"><span class="tagline">財經雜誌</span><h3>沒有站內留言</h3><p>天下、商周、遠見、今周刊、數位時代。讀者互動靠 Podcast、電子報與投書。</p></div>
+      <div class="card"><span class="tagline">大報系</span><h3>各自建置</h3><ul><li>自由時報：自建、系統先審後刊</li><li>udn：自建討論區</li><li>中時：Disqus</li><li>ETtoday：自建，導向 App</li></ul></div>
+      <div class="card accent"><span class="tagline">會員制</span><h3>留言是會員權益</h3><ul><li>端傳媒：僅付費會員；「拾論」定期整理讀者留言與記者回應</li><li>關鍵評論網：邀請制沙龍，顯示職稱</li></ul></div>
+      <div class="card"><span class="tagline">站外</span><h3>真正的討論場</h3><ul><li>2026 起，三大新聞網引用 Threads 的次數超過 PTT 與 Dcard 合計</li><li>PTT 八卦版可以禁止張貼特定媒體</li><li>粉專留言容易被動員</li></ul></div>
+    </div>
+    <div class="card fill"><b>法律面：</b>台灣沒有專門規範媒體對讀者留言責任的法律，數位中介服務法草案已暫緩；判例多追究留言者本人。媒體主要靠自訂條款管理風險。</div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch4" target="_blank" rel="noopener">完整報告：第 4 章・台灣媒體</a><span class="s-num"></span></div>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-title="給天下的建議路線圖">
+  <div class="s-top"><b>給天下的建議</b>路線圖</div>
+  <h2 class="s-title">建議路線：先小規模試點，再做內容化與專家層</h2>
+  <div class="s-body">
+    <div class="road">
+      <div class="phase"><div class="when">2026-11～12</div><h3>第 0 階段：準備</h3><ul><li>團隊對決策點定方向</li><li>訂出試點人力與範圍</li><li>技術盤點：避開依賴 Perspective 的方案，實測繁中審核能力</li></ul></div>
+      <div class="phase"><div class="when">2027 上半年</div><h3>第 1 階段：試點</h3><ul><li>會員限定 × 編輯選題 × 記者在場</li><li>精選文章開放，或每日議題討論，可兩案並行比較</li><li>先審後刊，AI 初篩、人工決定</li></ul></div>
+      <div class="phase"><div class="when">2027 下半年</div><h3>第 2 階段：內容化與專家層</h3><ul><li>每週「讀者怎麼說」，同步電子報與《聽天下》</li><li>天下專家評論層：30–50 位實名專家</li><li>服務型內容試用「實作筆記」</li></ul></div>
+      <div class="phase"><div class="when">持續進行</div><h3>站外與特殊情境</h3><ul><li>站外質疑的更正與回應流程</li><li>選舉期、重大災難、涉及未成年人的留言規則</li></ul></div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-8" target="_blank" rel="noopener">完整報告：第 0 章・天下現況與建議路線圖</a><span class="s-num"></span></div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-title="試點設計">
+  <div class="s-top"><b>給天下的建議</b>第 1 階段試點</div>
+  <h2 class="s-title">試點設計：會員限定 × 編輯選題 × 記者在場</h2>
+  <div class="s-body">
+    <div class="grid g3">
+      <div class="card"><h3>身分</h3><p>人人可讀，付費或驗證會員可寫；用天下群帳號，不顯示 IP。</p></div>
+      <div class="card"><h3>範圍</h3><p>(a) 每週 3–5 篇議題文，開放 72 小時；或 (b) 每天 1–2 題議題討論。</p></div>
+      <div class="card"><h3>開場</h3><p>每串由具名記者或編輯先問一個<b>具體</b>問題，AI 擬 3 個候選、編輯挑選。</p></div>
+      <div class="card"><h3>審核</h3><p>先審後刊；AI 初篩、拒絕由人做；前三個月全數人工複核；送出前用字提醒。</p></div>
+      <div class="card"><h3>介面</h3><p>分頁「天下精選／讀者推薦／全部」；只放正向反應、不設倒讚；精選優先選新留言者。</p></div>
+      <div class="card"><h3>記者與條款</h3><p>每串至少 2–3 則具名回應。條款寫明禁止事項、處置、申訴管道、轉載授權、資料保存。</p></div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-8" target="_blank" rel="noopener">完整報告：第 0 章・建議路線圖</a><span class="s-num"></span></div>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-title="決策點與追蹤指標">
+  <div class="s-top"><b>下一步</b>文章留言機制研究</div>
+  <h2 class="s-title">建議團隊先討論的六個決策點</h2>
+  <div class="s-body">
+    <div class="grid g2" style="gap:1.6em">
+      <ol class="dec">
+        <li><span><b>目的優先序：</b>會員留存、內容原料、品牌信任，還是專家社群？</span></li>
+        <li><span><b>發言門檻：</b>所有會員或只有付費會員？顯示真名、職稱或暱稱？</span></li>
+        <li><span><b>人力：</b>能投入多少審核與社群人力？決定每天能開放多少。</span></li>
+        <li><span><b>記者參與：</b>要不要寫進記者 KPI？</span></li>
+        <li><span><b>專家層：</b>要不要做、怎麼邀請、利益怎麼揭露？</span></li>
+        <li><span><b>系統：</b>自建還是採購？資料要能自己掌握。</span></li>
+      </ol>
+      <div class="card fill">
+        <h3>從第一天就追蹤的指標</h3>
+        <ul>
+          <li><b>參與：</b>留言者占會員比例、高頻留言者集中度</li>
+          <li><b>品質：</b>審核通過率（Spiegel 約 90%）、精選率</li>
+          <li><b>編輯部：</b>記者回應率、留言轉成內容的篇數</li>
+          <li><b>商業：</b>用 A/B 實驗比較 90 天續訂率與閱讀頻率</li>
+          <li><b>營運：</b>每則留言審核成本、夜間與週末的拒絕率</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#c0-13" target="_blank" rel="noopener">完整報告：第 0 章・決策點</a><span class="s-num"></span></div>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-title="延伸閱讀：完整報告">
+  <div class="s-top"><b>延伸閱讀</b>完整報告</div>
+  <h2 class="s-title">需要細節與出處時，請閱讀完整報告</h2>
+  <p class="s-lead">5 章、約 88 分鐘、251 條參考資料。每項事實都附來源，未查證之處逐項標示。</p>
+  <div class="s-body">
+    <div class="chapters">
+      <a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch0" target="_blank" rel="noopener"><span class="cn">00</span><b>總覽與比較</b><span class="muted">結論、模式、建議路線圖、待查證清單</span></a>
+      <a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch1" target="_blank" rel="noopener"><span class="cn">01</span><b>紐約時報</b><span class="muted">時間軸、先審制度、Moderator、NYT Picks</span></a>
+      <a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch2" target="_blank" rel="noopener"><span class="cn">02</span><b>國外財經媒體</b><span class="muted">WSJ、FT、Economist、日經、NewsPicks 等</span></a>
+      <a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch3" target="_blank" rel="noopener"><span class="cn">03</span><b>國外綜合媒體與研究工具</b><span class="muted">Guardian、WaPo、Spiegel、Naver、Yahoo!；研究與 AI</span></a>
+      <a href="https://diedy-cw.github.io/20261102-文章留言機制研究/#ch4" target="_blank" rel="noopener"><span class="cn">04</span><b>台灣媒體</b><span class="muted">約 30 家實測、站外討論、法律脈絡</span></a>
+    </div>
+    <div class="card fill" style="margin-top:.4em">
+      <p><b>完整報告網址</b></p>
+      <p class="url"><a href="https://diedy-cw.github.io/20261102-文章留言機制研究/" target="_blank" rel="noopener">https://diedy-cw.github.io/20261102-文章留言機制研究/</a></p>
+    </div>
+    <p class="note">研究日期 2026-11-02。資料蒐集與整理由 AI（Claude）協作完成，各項事實請以原始來源為準。</p>
+  </div>
+  <div class="s-foot"><span>文章留言機制研究｜快速閱讀版</span><span class="s-num"></span></div>
+</section>
+
+</div>
+</div>
+
+<div class="progress" aria-hidden="true"></div>
+<nav class="bar" aria-label="簡報控制">
+  <button class="ctl" id="ov" type="button">全部頁面</button>
+  <button class="ctl" id="prev" type="button">上一頁</button>
+  <span class="count" aria-live="polite"></span>
+  <button class="ctl" id="next" type="button">下一頁</button>
+  <span class="hint">鍵盤左右鍵翻頁，按 O 看全部頁面</span>
+  <span class="spacer"></span>
+  <a class="ctl" href="https://diedy-cw.github.io/20261102-文章留言機制研究/" target="_blank" rel="noopener">閱讀完整報告</a>
+</nav>
+<div class="overview" role="dialog" aria-label="全部頁面">
+  <h2>全部頁面</h2>
+  <div class="ov-grid"></div>
+</div>
+
+<script>
+(function () {
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var count = document.querySelector('.count');
+  var progress = document.querySelector('.progress');
+  var prevBtn = document.getElementById('prev');
+  var nextBtn = document.getElementById('next');
+  var ov = document.querySelector('.overview');
+  var ovGrid = document.querySelector('.ov-grid');
+  var n = slides.length, cur = 0;
+
+  slides.forEach(function (s, i) {
+    var num = s.querySelector('.s-num');
+    if (num) num.textContent = (i + 1) + ' / ' + n;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<span class="on">' + (i + 1) + '</span><span></span>';
+    b.lastChild.textContent = s.dataset.title;
+    b.addEventListener('click', function () { closeOv(); go(i); });
+    ovGrid.appendChild(b);
+  });
+
+  function reflow() { return document.body.classList.contains('reflow'); }
+
+  function go(i) {
+    cur = Math.max(0, Math.min(n - 1, i));
+    if (reflow()) { slides[cur].scrollIntoView(); }
+    slides.forEach(function (s, j) { s.classList.toggle('active', j === cur); });
+    count.textContent = (cur + 1) + ' / ' + n;
+    progress.style.width = ((cur + 1) / n * 100) + '%';
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === n - 1;
+    Array.prototype.forEach.call(ovGrid.children, function (b, j) { b.classList.toggle('cur', j === cur); });
+    var h = '#' + (cur + 1);
+    if (location.hash !== h) history.replaceState(null, '', h);
+  }
+
+  function fit() {
+    var w = window.innerWidth, h = window.innerHeight;
+    var narrow = w < 760 || (h < 460 && w < 1000);
+    document.body.classList.toggle('reflow', narrow);
+    if (narrow) { deck.style.transform = ''; return; }
+    var bar = 52, s = Math.min(w / 1280, (h - bar) / 720);
+    deck.style.transform = 'scale(' + s + ') translate(-50%, -50%)';
+  }
+
+  function openOv() { ov.classList.add('open'); var c = ovGrid.children[cur]; if (c) c.focus(); }
+  function closeOv() { ov.classList.remove('open'); }
+
+  prevBtn.addEventListener('click', function () { go(cur - 1); });
+  nextBtn.addEventListener('click', function () { go(cur + 1); });
+  document.getElementById('ov').addEventListener('click', function () { ov.classList.contains('open') ? closeOv() : openOv(); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if (k === 'o' || k === 'O') { ov.classList.contains('open') ? closeOv() : openOv(); return; }
+    if (k === 'Escape') { closeOv(); return; }
+    if (ov.classList.contains('open') || reflow()) return;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); go(cur + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go(cur - 1); }
+    else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(n - 1); }
+  });
+
+  var tx = null, ty = null;
+  document.querySelector('.stage').addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  document.querySelector('.stage').addEventListener('touchend', function (e) {
+    if (tx === null || reflow()) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1));
+    tx = null;
+  });
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function () { var i = parseInt(location.hash.slice(1), 10); if (i) go(i - 1); });
+
+  fit();
+  var start = parseInt(location.hash.slice(1), 10);
+  go(start ? start - 1 : 0);
+  if (reflow() && !start) window.scrollTo(0, 0);
+})();
+</script>
+</body>
+</html>
