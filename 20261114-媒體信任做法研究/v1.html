@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>媒體信任做法研究</title>
+<meta name="description" content="整理兩種媒體建立信任的做法：在報導旁附上採訪說明，以及把讀者提問做成報導。比較美國研究的設計、結果與限制，並討論放到台灣媒體時要注意的事。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f3f5f5; --paper: #ffffff; --fg: #182324; --muted: #4f5d5e;
+  --line: #c6d1d0; --accent: #196a62; --link: #0d655d; --soft: #eaf3f1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1516; --paper: #172021; --fg: #e3eaea; --muted: #a5b3b3;
+    --line: #34413f; --accent: #5cc0b3; --link: #7fd4c8; --soft: #1e2e2c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1516; --paper: #172021; --fg: #e3eaea; --muted: #a5b3b3;
+  --line: #34413f; --accent: #5cc0b3; --link: #7fd4c8; --soft: #1e2e2c;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--fg); font: 17px/1.85 "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); }
+main { max-width: 760px; margin: auto; padding: clamp(24px, 5vw, 60px) clamp(16px, 5vw, 60px); background: var(--paper); }
+header { padding-bottom: 18px; }
+h1 { font-size: clamp(1.75rem, 5vw, 2.5rem); line-height: 1.3; letter-spacing: -.02em; margin: 0 0 .5em; }
+h2 { font-size: clamp(1.15rem, 3vw, 1.36rem); line-height: 1.5; margin: 0 0 .75em; }
+h3 { font-size: 1.05rem; line-height: 1.5; margin: 1.4em 0 .4em; }
+p, li { overflow-wrap: anywhere; }
+p { margin: .75em 0; }
+.meta { color: var(--muted); font-size: .9rem; margin: 0; }
+section { border-top: 1px solid var(--line); padding: 24px 0; }
+#summary { border-top: 3px solid var(--accent); }
+a { color: var(--link); text-underline-offset: .18em; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+sup a { text-decoration: none; font-size: .8em; padding: 0 .1em; }
+.note { background: var(--soft); border-left: 3px solid var(--accent); padding: 12px 16px; margin: 1em 0; }
+.note p { margin: .3em 0; }
+ul, ol { padding-left: 1.4em; }
+li { margin: .35em 0; }
+.table-wrap { overflow-x: auto; margin: 1em 0; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .9rem; line-height: 1.6; }
+th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+thead th { background: var(--soft); }
+tbody th { width: 6.5em; background: var(--soft); font-weight: 700; }
+.refs li { font-size: .92rem; }
+@media print { html, body { background: white; } main { padding: 0; } .table-wrap { overflow: visible; } }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>媒體如何贏得信賴？兩種做法的研究證據</h1>
+  <p class="meta">整理日期：2026 年 11 月 14 日 ｜ 資料來源：美國德州大學奧斯汀分校媒體參與中心（Center for Media Engagement）的三項研究</p>
+</header>
+
+<section id="summary">
+  <h2>摘要</h2>
+  <p><strong>在報導旁附上採訪說明，有機會提高讀者對媒體的評價，但效果不穩定，讀者也常常沒看到。把讀者的提問做成報導，則讓閱聽人對媒體的評價更正面，也帶來較多新訂閱。</strong></p>
+  <p>兩種做法改善的是不同結果。目前的研究都在美國進行，而且沒有直接證明這些做法能帶來長期的信任。放到台灣媒體使用前，需要自行測試。</p>
+</section>
+
+<section id="compare">
+  <h2>兩種做法比較</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th scope="col"></th><th scope="col">附上採訪說明</th><th scope="col">把讀者提問做成報導</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">研究設計</th><td>線上實驗，讀者隨機看到有或沒有說明的同一篇報導</td><td>20 個新聞網站隨機分成兩組，實施約六個月</td></tr>
+        <tr><th scope="row">樣本</th><td>2019 年兩次實驗共 1,312 人；2020 年 321 人</td><td>兩次問卷調查共 3,998 人，加上訂閱與流量數據</td></tr>
+        <tr><th scope="row">衡量指標</th><td>讀者看完文章後，對媒體的信任相關評分</td><td>閱聽人對媒體的評價、新訂閱、續訂、網站流量</td></tr>
+        <tr><th scope="row">主要結果</th><td>三次實驗結果不一：1/12 項、11/12 項、0 項改善</td><td>評價更正面、新訂閱增加；續訂與流量沒有改變</td></tr>
+        <tr><th scope="row">主要限制</th><td>只測量讀完當下的評分；讀者常沒注意到說明</td><td>只有 20 個網站且同屬一家公司；沒有單獨回報信任的變化</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="process">
+  <h2>做法一：附上採訪說明，效果不穩定</h2>
+  <p><strong>做法。</strong>在報導旁加一小段文字，說明為什麼採訪這個題目、查了哪些資料，以及記者如何得出結論。</p>
+
+  <h3>2019 年：兩次實驗的結果差距很大</h3>
+  <p>研究團隊讓讀者看同一篇報導的兩個版本，一個有採訪說明，一個沒有，再請讀者用 12 個項目評分，例如可信、準確、公平、可靠。<sup><a href="#ref1" aria-label="參考資料 1">[1]</a></sup></p>
+  <ul>
+    <li><strong>第一次實驗</strong>（753 人，使用虛構的新聞網站）：12 項中只有「可靠」1 項顯著提高。</li>
+    <li><strong>第二次實驗</strong>（559 人，使用仿照《USA TODAY》與《The Tennessean》外觀製作的網站）：12 項中有 11 項顯著提高，只有「沒有特定立場」這項沒有差異。</li>
+  </ul>
+  <p>同樣的做法，在兩次實驗得到很不一樣的結果。第一次實驗測了 12 項，只有 1 項達到顯著，這樣的結果也可能只是巧合。研究團隊認為媒體可以考慮使用採訪說明，但從這兩次實驗看，效果會隨情境而改變。</p>
+
+  <h3>2020 年：多數讀者沒注意到，信任評分也沒有差異</h3>
+  <p>研究團隊在美國 McClatchy 集團旗下三家地方報紙（共 321 人），比較三種版本：說明放在文中、放在文末，以及沒有說明。<sup><a href="#ref2" aria-label="參考資料 2">[2]</a></sup></p>
+  <ul>
+    <li><strong>讀者注意到的比例低。</strong>說明放在文中時，只有 33.7% 的人記得看過；放在文末時只有 21.2%。</li>
+    <li><strong>信任評分沒有差異。</strong>三組讀者對媒體、文章與記者的信任評分，都沒有顯著不同。</li>
+    <li>不過，當研究團隊把說明單獨拿給讀者看時，多數人表示這會讓他們更信任媒體。</li>
+  </ul>
+  <div class="note">
+    <p><strong>怎麼解讀：</strong>這次實驗沒有效果，可能有兩個原因。一是讀者沒有看到說明；二是說明本身的效果原本就很小。現有資料無法分辨是哪一個。媒體如果要採用，除了寫好說明，也要測試讀者是否真的看到，以及看到之後評價有沒有改變。</p>
+  </div>
+</section>
+
+<section id="questions">
+  <h2>做法二：把讀者提問做成報導，評價與新訂閱都提高</h2>
+  <p><strong>做法。</strong>邀請居民提出想了解的地方議題，再由讀者投票。記者每月從票數最高的問題中挑選 2 到 3 題採訪，並刊出報導。研究中使用的是 Hearken 這套讀者提問平台。</p>
+  <p><strong>研究設計。</strong>研究團隊把同一家公司旗下 20 個美國地方新聞網站，依規模分組後隨機分成兩組。一組實施約六個月，另一組維持原本的做法。研究團隊在實施前後各做一次閱聽人問卷調查（共 3,998 人），並比較兩組網站的訂閱與流量數據。<sup><a href="#ref3" aria-label="參考資料 3">[3]</a><a href="#ref4" aria-label="參考資料 4">[4]</a></sup></p>
+  <p><strong>研究結果。</strong></p>
+  <ul>
+    <li><strong>閱聽人評價更正面。</strong>實施組的閱聽人對媒體的整體看法更好，更覺得自己能影響報導選題，也更認為媒體願意回應社區。</li>
+    <li><strong>新訂閱增加。</strong>增加的幅度可以從統計上看出來，但不算大。</li>
+    <li><strong>續訂與網站流量沒有改變。</strong>頁面瀏覽量與回訪次數都沒有明顯差異。</li>
+  </ul>
+  <div class="note">
+    <p><strong>要注意：</strong>研究摘要與論文摘要都沒有單獨回報「信任」的變化，而是使用「評價更正面」「關係改善」等說法。因此，這項研究支持的是「改善媒體與社區的關係」，不能直接解讀為「提高信任」。這份感受能否變成長期的信任，還需要在計畫結束後持續追蹤。</p>
+  </div>
+  <p>另外，20 個網站都屬於同一家公司，網站數量也不多。效果能否推廣到其他媒體，仍要保守看待。</p>
+</section>
+
+<section id="reading">
+  <h2>如何看待這些結果</h2>
+  <p><strong>文章評分、與媒體的關係、訂閱行為，是三種不同的結果，要分開看。</strong></p>
+  <ul>
+    <li><strong>讀完文章後的評分</strong>：反映讀者當下的觀感，是做法一主要測量的結果。</li>
+    <li><strong>與媒體的關係</strong>：反映閱聽人是否覺得意見被聽見，是做法二主要改善的結果。</li>
+    <li><strong>訂閱行為</strong>：是實際的行動，做法二在新訂閱上有效果，續訂則沒有。</li>
+  </ul>
+  <p>這三種結果都有意義，但都不等於長期信任。要衡量長期信任，需要在一段時間內反覆調查同一群閱聽人。</p>
+</section>
+
+<section id="taiwan">
+  <h2>放到台灣媒體時要注意的事</h2>
+  <p>這三項研究都以美國媒體與美國讀者為對象，做法二更是以地方新聞網站為主。台灣的媒體環境有幾個不同之處，可能影響效果：</p>
+  <ul>
+    <li><strong>讀者接觸新聞的管道。</strong>許多讀者透過社群平台或新聞彙整服務看到新聞，不一定會進入媒體網站，附在報導旁的說明可能更容易被略過。</li>
+    <li><strong>收入模式。</strong>許多台灣新聞網站仍以免費閱讀為主，「新訂閱增加」這項結果不一定適用，需要找其他可以比較的指標，例如會員註冊或回訪率。</li>
+    <li><strong>媒體類型。</strong>做法二的研究對象是地方媒體，社區議題比較明確。全國性媒體採用時，需要先想清楚要回應哪一群讀者。</li>
+  </ul>
+</section>
+
+<section id="actions">
+  <h2>實務建議</h2>
+  <ol>
+    <li><strong>先小規模測試，再全面導入。</strong>選幾個專題或欄目試行，並保留沒有實施的對照組，才能看出差異。</li>
+    <li><strong>採訪說明要放在讀者看得到的地方。</strong>上線後檢查點擊或閱讀數據，確認讀者真的有注意到。</li>
+    <li><strong>讀者提問的計畫要持續一段時間。</strong>研究中的計畫實施了約六個月，短期活動可能看不到效果。</li>
+    <li><strong>事先決定要看哪些指標。</strong>分開追蹤讀者評價、與媒體的關係、訂閱或會員行為，並在計畫結束後繼續追蹤，確認效果能否維持。</li>
+  </ol>
+</section>
+
+<section id="references">
+  <h2>參考資料</h2>
+  <ol class="refs">
+    <li id="ref1">Masullo, G. M., Curry, A., &amp; Whipple, K. (2019, February). <i>Building Trust: What Works for News Organizations</i>. Center for Media Engagement. <a href="https://mediaengagement.org/research/building-trust/">https://mediaengagement.org/research/building-trust/</a></li>
+    <li id="ref2">Murray, C., &amp; Stroud, N. J. (2020, January). <i>Testing Behind the Story Cards</i>. Center for Media Engagement. <a href="https://mediaengagement.org/research/behind-the-story-cards/">https://mediaengagement.org/research/behind-the-story-cards/</a></li>
+    <li id="ref3">Stroud, N. J., &amp; Van Duyn, E. (2023, September). <i>Curbing the Decline of Local News Through Engaged Journalism</i>. Center for Media Engagement. <a href="https://mediaengagement.org/research/local-news-engaged-journalism/">https://mediaengagement.org/research/local-news-engaged-journalism/</a></li>
+    <li id="ref4">Stroud, N. J., &amp; Van Duyn, E. (2023). Curbing the decline of local news by building relationships with the audience. <i>Journal of Communication, 73</i>(5), 452–462. <a href="https://doi.org/10.1093/joc/jqad018">https://doi.org/10.1093/joc/jqad018</a></li>
+  </ol>
+  <p class="meta">以上網頁於 2026 年 11 月 14 日查閱。論文 [4] 全文需付費，本報告依據論文摘要與研究團隊發布的摘要網頁整理。</p>
+</section>
+</main>
+</body>
+</html>
